@@ -4,8 +4,8 @@ import type { Warehouse } from "../warehouse/warehouse";
 const CURRENT_CASH_REGISTER_URI = "/v1/cash-registers";
 
 export interface CashRegister extends Entity {
-  code: String;
-  employeeId: String;
+  code: string;
+  employeeId: string;
   active: Boolean;
   warehouse: Warehouse;
 }
@@ -14,7 +14,7 @@ export interface CreateCashRegister {
   code: string;
   active: boolean;
   warehouseId: string;
-  employeeId: string;
+  employeeId: string|null;
 }
 
 export interface SpecCashRegister {
@@ -64,7 +64,7 @@ export const updateCashRegister = async (id: string, data: UpdateCashRegister) =
 
 export const toogleCashRegister = async (id: string) => {
   const response = await $api<CashRegister>(`${CURRENT_CASH_REGISTER_URI}/${id}/toogle`, {
-    method: "PUT",
+    method: "PATCH",
   });
   return response;
 }

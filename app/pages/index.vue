@@ -34,6 +34,11 @@ const menus = [
     description: "Administracion de Proveedores",
     route: "/proveedores",
   },
+  {
+    title: "Cajas",
+    description: "Administracion de Cajas",
+    route: "/cajas",
+  }
 ];
 
 defineExpose({ menus });
