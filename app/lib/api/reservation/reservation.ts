@@ -22,7 +22,7 @@ export interface SpecReservation {
     cancelled:boolean|null;
 }
 
-interface CreateReservation {
+export interface CreateReservation {
     startTime:string;
     endTime:string;
     date:string;

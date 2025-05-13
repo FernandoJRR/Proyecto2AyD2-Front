@@ -3,20 +3,20 @@ import type { Entity } from "../utils/entity";
 const CURRENT_WAREHOUSE_URI = "/v1/warehouses";
 
 export interface Warehouse extends Entity {
-  name: String;
-  ubication: String;
+  name: string;
+  ubication: string;
   active: Boolean;
 }
 
 export interface UpdateWarehouse {
-  name: String;
-  ubication: String;
+  name: string;
+  ubication: string;
   active: Boolean;
 }
 
 export interface CreateWarehouse {
-  name: String;
-  ubication: String;
+  name: string;
+  ubication: string;
   active: Boolean;
 }
 
