@@ -44,6 +44,21 @@ const menus = [
     description: "Administracion de Productos",
     route: "/productos",
   },
+  {
+    title: "Entradas Productos",
+    description: "Administracion de Entradas de Productos",
+    route: "/entradas_productos",
+  },
+  {
+    title: "Reservaciones",
+    description: "Administracion de Reservaciones",
+    route: "/reservaciones",
+  },
+  {
+    title: "Horarios",
+    description: "Administracion de Horarios",
+    route: "/horarios",
+  }
 ];
 
 defineExpose({ menus });

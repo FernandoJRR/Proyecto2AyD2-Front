@@ -62,9 +62,11 @@ export const createProduct = async (data: CreateProduct) => {
 };
 
 export const getAllProducts = async (data: SpecProduct) => {
-    const response = await $api<Product[]>(`${CURRENT_PRODUCT_URI}/all${genParams(data)}`);
-    return response;
-}
+  const response = await $api<Product[]>(
+    `${CURRENT_PRODUCT_URI}/all${genParams(data)}`
+  );
+  return response;
+};
 
 export const updateProduct = async (data: UpdateProduct, id: string) => {
   const response = await $api<Product>(`${CURRENT_PRODUCT_URI}/${id}`, {
@@ -98,6 +100,14 @@ export const getStates = async () => {
 export const getTypes = async () => {
   const response = await $api<TypeProduct[]>(`${CURRENT_PRODUCT_URI}/types`, {
     method: "GET",
+  });
+  return response;
+};
+
+export const getPrductsByIds = async (ids: string[]) => {
+  const response = await $api<Product[]>(`${CURRENT_PRODUCT_URI}/ids`, {
+    method: "POST",
+    body: ids,
   });
   return response;
 };
