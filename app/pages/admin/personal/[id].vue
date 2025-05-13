@@ -34,42 +34,21 @@
             </Tag>
           </div>
         </div>
-        <DataTable :value="filteredVacations">
-          <template #header>
-            <div class="flex justify-start">
-              <p class="text-3xl font-medium mb-4">Vacaciones</p>
-              <div class="mb-4">
-                <Select v-model="selectedYear" :options="availableYears"
-                  placeholder="Elige un periodo" class="ml-4">
-                  <template #option="slotProps">
-                    <div class="flex items-center gap-2">
-                      <span>{{ slotProps.option }}</span>
-                    </div>
-                  </template>
-                </Select>
-              </div>
-            </div>
+        <div>
+          <p class="text-3xl font-medium mb-4">Caja Asignada</p>
+          <Tag severity="warn">
+          {{ cashRegister.status === "error"
+            ? "No se encontro una Caja Registradora asignada"
+            : `Asignada la caja ${cashRegister.data?.code}`
+          }}
+          </Tag>
+          <template v-if="availableCashRegisters.status !== 'error'">
+            <p class="text-xl font-medium mb-2 mt-2">Asignar Nueva Caja</p>
+            <Select v-model="selectedCashRegister" :options="availableCashRegisters.data" optionLabel="code"
+              placeholder="Selecciona una caja registradora" class="w-full md:w-56" />
+            <Button class="ml-2" label="Asignar" @click="submitChangeCashRegister" />
           </template>
-          <template #loading>
-            Cargando vacaciones del empleado.
-          </template>
-          <Column field="beginDate" header="Fecha Inicio" style="min-width: 12rem">
-          </Column>
-          <Column field="endDate" header="Fecha Fin" style="min-width: 12rem">
-          </Column>
-          <Column field="wasUsed" header="Se Uso" style="min-width: 12rem">
-            <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <Tag v-if="data.wasUsed" rounded>
-                  Si
-                </Tag>
-                <Tag v-else severity="danger" rounded>
-                  No
-                </Tag>
-              </div>
-            </template>
-          </Column>
-        </DataTable>
+        </div>
       </div>
       <div>
         <div class="flex flex-row">
@@ -114,7 +93,12 @@
 </template>
 <script setup lang="ts">
 import { Select } from 'primevue';
+import { toast } from 'vue-sonner';
 import { getEmployeeById } from '~/lib/api/admin/employee';
+import { getAllCashRegisters, getCashRegisterByEmployeeId, updateCashRegister, type CashRegister, type UpdateCashRegister } from '~/lib/api/cash_register/cashRegister';
+import { useQueryCache } from '@pinia/colada'
+
+const queryCache = useQueryCache()
 
 const { state } = useCustomQuery({
   key: ['usuario', useRoute().params.id as string],
@@ -127,7 +111,71 @@ const { state } = useCustomQuery({
   })
 })
 
+const selectedCashRegister = ref<CashRegister>()
+
+const { state: cashRegister } = useCustomQuery({
+  key: ['caja-empleado', useRoute().params.id as string],
+  query: () => getCashRegisterByEmployeeId(useRoute().params.id as string)
+})
+
+const { state: availableCashRegisters } = useCustomQuery({
+  key: ['cajas-registradoras-disponibles'],
+  query: () => getAllCashRegisters({ id: null, employeeId: "", code: null, active: true, warehouseId: null })
+    .then((r) => r.filter((current) => current.employeeId === ""))
+})
+
+const { mutate: changeEmployeeCashRegister } = useMutation({
+  mutation: async (updateData: UpdateCashRegister) => {
+    if (cashRegister.value.status === 'error') {
+      //Si el empleado no tiene asignada una caja registradora simplemente se le asigna una
+      return updateCashRegister(selectedCashRegister.value?.id ?? "", updateData)
+    } else {
+      //Si ya tenia asignada una se tiene que desasignar primero esa y luego se asigna la nueva
+      await updateCashRegister(selectedCashRegister.value?.id ?? "", {
+        code: cashRegister.value.data?.code ?? "",
+        employeeId: "",
+        active: cashRegister.value.data?.active ?? true,
+        warehouseId: cashRegister.value.data?.warehouse.id ?? ""
+      })
+
+      return updateCashRegister(selectedCashRegister.value?.id ?? "", updateData)
+    }
+  },
+  onError(error) {
+    toast.error('Ocurrió un error al actualizar la caja registradora.', {
+      description: error
+    })
+  },
+  onSuccess() {
+    toast.success('Caja asignada exitosamente')
+    queryCache.invalidateQueries({
+      key: ['cajas-registradoras-disponibles'],
+      exact: true,
+    });
+    queryCache.invalidateQueries({
+      key: ['caja-empleado', useRoute().params.id as string],
+      exact: true,
+    });
+  }
+})
+
 const selectedYear = ref<number | null>(null);
+
+const submitChangeCashRegister = () => {
+  if (selectedCashRegister.value) {
+    const caja = selectedCashRegister.value
+    const payload: UpdateCashRegister = {
+      code: caja.code,
+      warehouseId: caja.warehouse.id,
+      active: caja.active,
+      employeeId: useRoute().params.id as string
+    }
+
+    changeEmployeeCashRegister(payload)
+  } else {
+    toast.warning("Selecciona una caja registradora")
+  }
+}
 
 const availableYears = computed(() => {
   return state.value.data?.vacations
