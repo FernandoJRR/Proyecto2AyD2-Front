@@ -3,31 +3,31 @@ import type { Entity } from "../utils/entity";
 const CURRENT_PRODUCT_URI = "/v1/products";
 
 export interface Product extends Entity {
-  name: String;
-  code: String;
-  barCode: String;
+  name: string;
+  code: string;
+  barCode: string;
   price: Number;
-  type: String;
-  state: String;
-  createdAt: String;
+  type: string;
+  state: string;
+  createdAt: string;
 }
 
 export interface CreateProduct {
-  name: String;
-  code: String;
-  barCode: String;
+  name: string;
+  code: string;
+  barCode: string;
   price: Number;
-  type: String;
-  state: String;
+  type: string;
+  state: string;
 }
 
 export interface UpdateProduct {
-  name: String;
-  code: String;
-  barCode: String;
+  name: string;
+  code: string;
+  barCode: string;
   price: Number;
-  type: String;
-  state: String;
+  type: string;
+  state: string;
 }
 
 export interface DeleteProduct {
@@ -46,11 +46,11 @@ export interface SpecProduct {
 }
 
 export interface StateProduct extends Entity {
-  name: String;
+  name: string;
 }
 
 export interface TypeProduct extends Entity {
-  name: String;
+  name: string;
 }
 
 export const createProduct = async (data: CreateProduct) => {
