@@ -58,7 +58,12 @@ const menus = [
     title: "Horarios",
     description: "Administracion de Horarios",
     route: "/horarios",
-  }
+  },
+  {
+    title: "Paquetes",
+    description: "Administracion de Paquetes",
+    route: "/paquetes",
+  },
 ];
 
 defineExpose({ menus });
