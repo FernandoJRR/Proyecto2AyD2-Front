@@ -20,31 +20,6 @@ const menus = [
     route: "/admin",
   },
   {
-    title: "Pacientes",
-    description: "Administracion de Pacientes",
-    route: "/pacientes",
-  },
-  {
-    title: "Farmacia",
-    description: "Administracion de Farmacia",
-    route: "/farmacia",
-  },
-  {
-    title: 'Habitaciones',
-    description: 'Administracion de Habitaciones',
-    route: '/habitaciones',
-  },
-  {
-    title: "Cirugías",
-    description: "Administracion de tipos de Cirugía",
-    route: "/cirugias",
-  },
-  {
-    title: "Consultas",
-    description: "Administracion de Consultas",
-    route: "/consultas",
-  },
-  {
     title: "Reportes",
     description: "Generación de Repotes",
     route: "/reportes",
