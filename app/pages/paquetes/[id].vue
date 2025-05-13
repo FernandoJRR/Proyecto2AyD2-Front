@@ -111,7 +111,7 @@ import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import { getPackageById, updatePackage } from '~/lib/api/package/package'
-import { getAllProducts, type Product } from '~/lib/api/products/product'
+import { getAllProducts, getStates, type Product } from '~/lib/api/products/product'
 import type { CreatePackageDetail, CreatePackage } from '~/lib/api/package/package'
 
 const route = useRoute()
@@ -145,8 +145,11 @@ const formInitialValues = ref({
 })
 
 onMounted(async () => {
+  const stateProducts = await getStates();
+  //Obtenemos el estdo que tenga name "Activo"
+  const activeState = stateProducts.find((state) => state.name === "Activo");
   const products = await getAllProducts({
-    id: null, name: null, code: null, barCode: null, type: null, state: null
+    id: null, name: null, code: null, barCode: null, type: null, state: activeState?.id || null
   })
   productOptions.value = products
   productMap.value = Object.fromEntries(products.map(p => [p.id, p]))
