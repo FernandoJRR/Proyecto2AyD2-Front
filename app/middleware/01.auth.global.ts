@@ -4,6 +4,8 @@ import { toast } from 'vue-sonner'
 export default defineNuxtRouteMiddleware((to, _from) => {
   const { user } = storeToRefs(useAuthStore())
 
+  if (to.path === '/example') return
+
   const token = useCookie('proyecto2ayd2-user-token')
 
   if (!token.value && !to?.fullPath.includes('login')) {
