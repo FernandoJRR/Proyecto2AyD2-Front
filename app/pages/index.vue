@@ -24,6 +24,11 @@ const menus = [
     description: "Generación de Repotes",
     route: "/reportes",
   },
+  {
+    title: "Bodegas",
+    description: "Administracion de Bodegas",
+    route: "/bodegas",
+  }
 ];
 
 defineExpose({ menus });
