@@ -61,7 +61,7 @@ export const createProduct = async (data: CreateProduct) => {
   return response;
 };
 
-export const getAllProducts = async (data: SpecProduct|null) => {
+export const getAllProducts = async (data: SpecProduct) => {
     const response = await $api<Product[]>(`${CURRENT_PRODUCT_URI}/all${genParams(data)}`);
     return response;
 }
