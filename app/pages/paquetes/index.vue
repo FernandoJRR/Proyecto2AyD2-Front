@@ -96,7 +96,7 @@ const toggleAvailability = (id: string, pkg: Package) => {
           description: pkg.description,
           price: pkg.price,
           active: !pkg.active,
-          details: pkg.packageDetail.map(p => ({
+          packageDetail: pkg.packageDetail.map(p => ({
             product: p.product.id,
             quantity: p.quantity
           }))

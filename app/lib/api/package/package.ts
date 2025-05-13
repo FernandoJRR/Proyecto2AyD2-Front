@@ -25,7 +25,7 @@ export interface CreatePackage {
     name:string;
     description:string;
     price:number;
-    details:CreatePackageDetail[];
+    packageDetail:CreatePackageDetail[];
     active:boolean;
 }
 

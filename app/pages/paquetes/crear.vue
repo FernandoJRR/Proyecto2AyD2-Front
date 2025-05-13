@@ -66,7 +66,7 @@
         </div>
 
         <Message
-          v-if="formTouched && form.details.length === 0"
+          v-if="formTouched && form.packageDetail.length === 0"
           severity="error"
           size="small"
           variant="simple"
@@ -74,7 +74,7 @@
           Debe agregar al menos un producto
         </Message>
 
-        <DataTable :value="form.details" class="mt-6" tableStyle="min-width: 100%">
+        <DataTable :value="form.packageDetail" class="mt-6" tableStyle="min-width: 100%">
           <Column header="Producto">
             <template #body="{ data }">
               {{ productMap[data.product]?.name ?? '—' }}
@@ -83,7 +83,7 @@
           <Column header="Cantidad" field="quantity" />
           <Column header="Acciones">
             <template #body="{ index }">
-              <Button icon="pi pi-trash" text severity="danger" @click="form.details.splice(index, 1)" />
+              <Button icon="pi pi-trash" text severity="danger" @click="form.packageDetail.splice(index, 1)" />
             </template>
           </Column>
         </DataTable>
@@ -126,7 +126,7 @@ const form = reactive<CreatePackage>({
   name: '',
   description: '',
   price: 0,
-  details: [],
+  packageDetail: [],
   active: true
 })
 
@@ -134,7 +134,7 @@ const initialValues = reactive({
   name: '',
   description: '',
   price: 0,
-  details: [],
+  packageDetail: [],
   active: true
 })
 
@@ -165,7 +165,7 @@ const addDetail = () => {
     return
   }
 
-  form.details.push({ ...tempDetail })
+  form.packageDetail.push({ ...tempDetail })
   tempDetail.product = ''
   tempDetail.quantity = 1
 }
@@ -173,10 +173,10 @@ const addDetail = () => {
 const onFormSubmit = (e: any) => {
   formTouched.value = true
 
-  if (e.valid && form.details.length > 0) {
+  if (e.valid && form.packageDetail.length > 0) {
     const payload: CreatePackage = {
       ...e.values,
-      details: [...form.details],
+      packageDetail: [...form.packageDetail],
       active: true
     }
 
@@ -189,7 +189,7 @@ const onFormSubmit = (e: any) => {
       accept: () => mutate(payload),
       reject: () => toast.warning('Creación cancelada')
     })
-  } else if (form.details.length === 0) {
+  } else if (form.packageDetail.length === 0) {
     toast.error('Debes agregar al menos un producto')
   }
 }
