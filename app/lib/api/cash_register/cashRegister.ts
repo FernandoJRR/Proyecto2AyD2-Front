@@ -6,7 +6,7 @@ const CURRENT_CASH_REGISTER_URI = "/v1/cash-registers";
 export interface CashRegister extends Entity {
   code: string;
   employeeId: string;
-  active: Boolean;
+  active: boolean;
   warehouse: Warehouse;
 }
 
