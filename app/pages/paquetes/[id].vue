@@ -6,11 +6,12 @@
       </router-link>
     </div>
 
-    <h1 class="text-4xl font-bold mb-6">Crear un paquete</h1>
+    <h1 class="text-4xl font-bold mb-6">Editar paquete</h1>
 
     <Form
+      v-if="isPackageReady"
       v-slot="$form"
-      :initialValues="initialValues"
+      :initialValues="formInitialValues"
       :resolver="resolver"
       @submit="onFormSubmit"
       class="space-y-8 bg-white shadow-md rounded-2xl p-6 border border-gray-200"
@@ -90,7 +91,7 @@
       </div>
 
       <div class="pt-4">
-        <Button type="submit" label="Crear" icon="pi pi-save" severity="secondary" />
+        <Button type="submit" label="Guardar cambios" icon="pi pi-save" severity="secondary" />
       </div>
     </Form>
 
@@ -99,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { FloatLabel } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
@@ -108,12 +110,17 @@ import { z } from 'zod'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
-import { createPackage } from '~/lib/api/package/package'
-import { getAllProducts, getStates, type Product } from '~/lib/api/products/product'
-import type { CreatePackage, CreatePackageDetail } from '~/lib/api/package/package'
+import { getPackageById, updatePackage } from '~/lib/api/package/package'
+import { getAllProducts, type Product } from '~/lib/api/products/product'
+import type { CreatePackageDetail, CreatePackage } from '~/lib/api/package/package'
 
+const route = useRoute()
 const confirm = useConfirm()
+const id = route.params.id as string
+
 const formTouched = ref(false)
+const isPackageReady = ref(false)
+
 const productOptions = ref<Product[]>([])
 const productMap = ref<Record<string, Product>>({})
 
@@ -125,33 +132,39 @@ const tempDetail = reactive<CreatePackageDetail>({
 const form = reactive<CreatePackage>({
   name: '',
   description: '',
-  price: 100,
+  price: 0,
   packageDetail: [],
   active: true
 })
 
-const initialValues = reactive({
+const formInitialValues = ref({
   name: '',
   description: '',
-  price: 100,
-  packageDetail: [],
+  price: 0,
   active: true
 })
 
 onMounted(async () => {
-  const stateProducts = await getStates();
-  //Obtenemos el estdo que tenga name "Activo"
-  const activeState = stateProducts.find((state) => state.name === "Activo");
   const products = await getAllProducts({
-    id: null,
-    name: null,
-    code: null,
-    barCode: null,
-    type: null,
-    state: activeState?.id || null
+    id: null, name: null, code: null, barCode: null, type: null, state: null
   })
   productOptions.value = products
   productMap.value = Object.fromEntries(products.map(p => [p.id, p]))
+
+  const data = await getPackageById(id)
+  formInitialValues.value = {
+    name: data.name,
+    description: data.description,
+    price: data.price,
+    active: data.active
+  }
+
+  form.packageDetail = data.packageDetail.map(d => ({
+    product: d.product.id,
+    quantity: d.quantity
+  }))
+
+  isPackageReady.value = true
 })
 
 const resolver = zodResolver(
@@ -184,13 +197,13 @@ const onFormSubmit = (e: any) => {
     }
 
     confirm.require({
-      message: '¿Está seguro de crear este paquete?',
+      message: '¿Desea guardar los cambios del paquete?',
       header: 'Confirmación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, crear',
+      acceptLabel: 'Sí, guardar',
       rejectLabel: 'Cancelar',
       accept: () => mutate(payload),
-      reject: () => toast.warning('Creación cancelada')
+      reject: () => toast.warning('Cambios cancelados')
     })
   } else if (form.packageDetail.length === 0) {
     toast.error('Debes agregar al menos un producto')
@@ -198,14 +211,14 @@ const onFormSubmit = (e: any) => {
 }
 
 const { mutate } = useMutation({
-  mutation: (payload: CreatePackage) => createPackage(payload),
+  mutation: (payload: CreatePackage) => updatePackage(id, payload),
   onError(error) {
-    toast.error('Error al crear el paquete', {
+    toast.error('Error al actualizar el paquete', {
       description: error.message
     })
   },
   onSuccess() {
-    toast.success('Paquete creado correctamente')
+    toast.success('Paquete actualizado correctamente')
     navigateTo('/paquetes/')
   }
 })

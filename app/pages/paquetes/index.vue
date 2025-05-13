@@ -17,20 +17,18 @@
 
       <Column header="Nombre" field="name">
         <template #body="{ data }">
-          {{ data.name ?? '—' }}
+          {{ data.name ?? "—" }}
         </template>
       </Column>
 
       <Column header="Descripción" field="description">
         <template #body="{ data }">
-          {{ data.description ?? '—' }}
+          {{ data.description ?? "—" }}
         </template>
       </Column>
 
       <Column header="Precio" field="price">
-        <template #body="{ data }">
-          Q{{ data.price.toFixed(2) }}
-        </template>
+        <template #body="{ data }"> Q{{ data.price.toFixed(2) }} </template>
       </Column>
 
       <Column header="Activo" field="active">
@@ -43,6 +41,9 @@
         <template #body="{ data }">
           <router-link :to="`/paquetes/${data.id}`">
             <Button label="Editar" severity="info" rounded text />
+          </router-link>
+          <router-link :to="`/paquetes/ver/${data.id}`">
+            <Button label="Ver" severity="success" rounded text />
           </router-link>
           <Button
             label="Cambiar Estado"
@@ -64,31 +65,31 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-import { useConfirm } from 'primevue/useconfirm'
-import ConfirmDialog from 'primevue/confirmdialog'
-import { toast } from 'vue-sonner'
+import { RouterLink } from "vue-router";
+import { useConfirm } from "primevue/useconfirm";
+import ConfirmDialog from "primevue/confirmdialog";
+import { toast } from "vue-sonner";
 import {
   getAllPackages,
   updatePackage,
-  type Package
-} from '~/lib/api/package/package'
+  type Package,
+} from "~/lib/api/package/package";
 
-const queryCache = useQueryCache()
-const confirm = useConfirm()
+const queryCache = useQueryCache();
+const confirm = useConfirm();
 
 const { state, asyncStatus } = useCustomQuery({
-  key: ['getAllPackages'],
-  query: getAllPackages
-})
+  key: ["getAllPackages"],
+  query: getAllPackages,
+});
 
 const toggleAvailability = (id: string, pkg: Package) => {
   confirm.require({
     message: `¿Deseas cambiar el estado del paquete "${pkg.name}"?`,
-    header: 'Confirmación',
-    icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Cambiar estado',
-    rejectLabel: 'Cancelar',
+    header: "Confirmación",
+    icon: "pi pi-exclamation-triangle",
+    acceptLabel: "Cambiar estado",
+    rejectLabel: "Cancelar",
     accept: async () => {
       try {
         await updatePackage(id, {
@@ -96,22 +97,24 @@ const toggleAvailability = (id: string, pkg: Package) => {
           description: pkg.description,
           price: pkg.price,
           active: !pkg.active,
-          packageDetail: pkg.packageDetail.map(p => ({
+          packageDetail: pkg.packageDetail.map((p) => ({
             product: p.product.id,
-            quantity: p.quantity
-          }))
-        })
-        toast.success('Estado del paquete actualizado correctamente.')
-        queryCache.invalidateQueries({ key: ['getAllPackages'] })
+            quantity: p.quantity,
+          })),
+        });
+        toast.success("Estado del paquete actualizado correctamente.");
+        queryCache.invalidateQueries({ key: ["getAllPackages"] });
       } catch (error: any) {
-        toast.error('Error al cambiar estado del paquete', {
-          description: error.message
-        })
+        toast.error("Error al cambiar estado del paquete", {
+          description: error.message,
+        });
       }
     },
     reject: () => {
-      toast.warning('Operación cancelada. No se modificó el estado del paquete.')
-    }
-  })
-}
+      toast.warning(
+        "Operación cancelada. No se modificó el estado del paquete."
+      );
+    },
+  });
+};
 </script>
