@@ -40,7 +40,7 @@
 
       <div>
         <p class="font-medium text-gray-600">Estado de cancelación</p>
-        <Tag :severity="reservation.cancelled ? 'danger' : 'info'" :value="reservation.cancelled ? 'Cancelada' : 'Activa'" />
+        <Tag :severity="reservation.cancelled ? 'danger' : 'info'" :value="reservation.cancelled ? 'Cancelada' : 'No Cancelada'" />
       </div>
     </div>
 
