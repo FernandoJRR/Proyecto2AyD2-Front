@@ -134,7 +134,7 @@ const { mutate: changeEmployeeCashRegister } = useMutation({
       //Si ya tenia asignada una se tiene que desasignar primero esa y luego se asigna la nueva
       await updateCashRegister(selectedCashRegister.value?.id ?? "", {
         code: cashRegister.value.data?.code ?? "",
-        employeeId: "",
+        employeeId: null,
         active: cashRegister.value.data?.active ?? true,
         warehouseId: cashRegister.value.data?.warehouse.id ?? ""
       })
