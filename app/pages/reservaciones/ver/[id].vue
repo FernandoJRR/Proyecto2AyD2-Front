@@ -9,8 +9,13 @@
 
     <div v-if="reservation" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <p class="font-medium text-gray-600">Usuario ID</p>
-        <p class="text-lg font-semibold">{{ reservation.userId }}</p>
+        <p class="font-medium text-gray-600">ID de la Reservacion</p>
+        <p class="text-lg font-semibold">{{ reservation.id }}</p>
+      </div>
+
+      <div>
+        <p class="font-medium text-gray-600">ID del Juego</p>
+        <p class="text-lg font-semibold">{{ reservation.gameId }}</p>
       </div>
 
       <div>
@@ -29,9 +34,15 @@
       </div>
 
       <div>
-        <p class="font-medium text-gray-600">Modalidad</p>
-        <Tag :value="reservation.online ? 'Virtual' : 'Presencial'" />
+        <p class="font-medium text-gray-600">Nombre del cliente</p>
+        <p class="text-lg">{{ reservation.customerFullname }}</p>
       </div>
+
+      <div>
+        <p class="font-medium text-gray-600">Nit del cliente</p>
+        <p class="text-lg">{{ reservation.userId }}</p>
+      </div>
+
 
       <div>
         <p class="font-medium text-gray-600">Estado de pago</p>
@@ -39,8 +50,9 @@
       </div>
 
       <div>
-        <p class="font-medium text-gray-600">Estado de cancelación</p>
-        <Tag :severity="reservation.cancelled ? 'danger' : 'info'" :value="reservation.cancelled ? 'Cancelada' : 'No Cancelada'" />
+        <p class="font-medium text-gray-600">El usuario se ha asistido?</p>
+        <Tag :severity="reservation.notShow ? 'danger' : 'info'"
+          :value="reservation.notShow ? 'No se presentó' : 'Asistió'" />
       </div>
     </div>
 
