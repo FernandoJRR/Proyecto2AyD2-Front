@@ -28,7 +28,7 @@ export interface SpecCashRegister {
 export interface UpdateCashRegister {
   code: string;
   active: boolean;
-  employeeId: string;
+  employeeId: string|null;
   warehouseId: string;
 }
 
