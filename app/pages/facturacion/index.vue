@@ -92,6 +92,10 @@ const paymentMethodOptions = ref<PaymentMethod[]>([])
 
 onMounted(async () => {
   paymentMethodOptions.value = await getPaymentMethods()
+  paymentMethodOptions.value.unshift({
+    name: 'Todos',
+    paymentMethod: null
+  })
 })
 
 const { state, asyncStatus, refetch } = useCustomQuery({
