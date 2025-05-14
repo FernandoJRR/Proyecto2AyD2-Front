@@ -64,6 +64,11 @@ const menus = [
     description: "Administracion de Paquetes",
     route: "/paquetes",
   },
+  {
+    title: "Facturas",
+    description: "Administracion de Facturas",
+    route: "/facturacion",
+  }
 ];
 
 defineExpose({ menus });
