@@ -120,8 +120,8 @@ const { state: cashRegister } = useCustomQuery({
 
 const { state: availableCashRegisters } = useCustomQuery({
   key: ['cajas-registradoras-disponibles'],
-  query: () => getAllCashRegisters({ id: null, employeeId: "", code: null, active: true, warehouseId: null })
-    .then((r) => r.filter((current) => current.employeeId === ""))
+  query: () => getAllCashRegisters({ id: null, employeeId: null, code: null, active: true, warehouseId: null })
+    .then((r) => r.filter((current) => current.employeeId === null))
 })
 
 const { mutate: changeEmployeeCashRegister } = useMutation({
@@ -133,7 +133,7 @@ const { mutate: changeEmployeeCashRegister } = useMutation({
       //Si ya tenia asignada una se tiene que desasignar primero esa y luego se asigna la nueva
       await updateCashRegister(selectedCashRegister.value?.id ?? "", {
         code: cashRegister.value.data?.code ?? "",
-        employeeId: "",
+        employeeId: null,
         active: cashRegister.value.data?.active ?? true,
         warehouseId: cashRegister.value.data?.warehouse.id ?? ""
       })
