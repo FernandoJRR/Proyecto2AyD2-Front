@@ -61,7 +61,7 @@ export interface ItemType {
 }
 
 export interface PaymentMethod {
-  paymentMethod: string;
+  paymentMethod: string|null;
   name: string;
 }
 
