@@ -20,35 +20,55 @@ const menus = [
     route: "/admin",
   },
   {
-    title: "Pacientes",
-    description: "Administracion de Pacientes",
-    route: "/pacientes",
-  },
-  {
-    title: "Farmacia",
-    description: "Administracion de Farmacia",
-    route: "/farmacia",
-  },
-  {
-    title: 'Habitaciones',
-    description: 'Administracion de Habitaciones',
-    route: '/habitaciones',
-  },
-  {
-    title: "Cirugías",
-    description: "Administracion de tipos de Cirugía",
-    route: "/cirugias",
-  },
-  {
-    title: "Consultas",
-    description: "Administracion de Consultas",
-    route: "/consultas",
-  },
-  {
     title: "Reportes",
     description: "Generación de Repotes",
     route: "/reportes",
   },
+  {
+    title: "Bodegas",
+    description: "Administracion de Bodegas",
+    route: "/bodegas",
+  },
+  {
+    title: "Proveedores",
+    description: "Administracion de Proveedores",
+    route: "/proveedores",
+  },
+  {
+    title: "Cajas",
+    description: "Administracion de Cajas",
+    route: "/cajas",
+  },
+  {
+    title: "Productos",
+    description: "Administracion de Productos",
+    route: "/productos",
+  },
+  {
+    title: "Entradas Productos",
+    description: "Administracion de Entradas de Productos",
+    route: "/entradas_productos",
+  },
+  {
+    title: "Reservaciones",
+    description: "Administracion de Reservaciones",
+    route: "/reservaciones",
+  },
+  {
+    title: "Horarios",
+    description: "Administracion de Horarios",
+    route: "/horarios",
+  },
+  {
+    title: "Paquetes",
+    description: "Administracion de Paquetes",
+    route: "/paquetes",
+  },
+  {
+    title: "Facturas",
+    description: "Administracion de Facturas",
+    route: "/facturacion",
+  }
 ];
 
 defineExpose({ menus });
