@@ -43,6 +43,7 @@
           }}
           </Tag>
           <template v-if="availableCashRegisters.status !== 'error'">
+            {{ availableCashRegisters.data }}
             <p class="text-xl font-medium mb-2 mt-2">Asignar Nueva Caja</p>
             <Select v-model="selectedCashRegister" :options="availableCashRegisters.data" optionLabel="code"
               placeholder="Selecciona una caja registradora" class="w-full md:w-56" />
@@ -120,8 +121,8 @@ const { state: cashRegister } = useCustomQuery({
 
 const { state: availableCashRegisters } = useCustomQuery({
   key: ['cajas-registradoras-disponibles'],
-  query: () => getAllCashRegisters({ id: null, employeeId: "", code: null, active: true, warehouseId: null })
-    .then((r) => r.filter((current) => current.employeeId === ""))
+  query: () => getAllCashRegisters({ id: null, employeeId: null, code: null, active: true, warehouseId: null })
+    .then((r) => r.filter((current) => current.employeeId === null))
 })
 
 const { mutate: changeEmployeeCashRegister } = useMutation({

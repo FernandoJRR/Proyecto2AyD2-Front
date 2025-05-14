@@ -29,7 +29,7 @@
           </Message>
         </div>
 
-        <div class="w-full">
+        <!-- <div class="w-full">
           <FloatLabel>
             <label for="employeeId">ID de empleado asignado</label>
             <InputText id="employeeId" name="employeeId" type="text" class="w-full" />
@@ -37,7 +37,7 @@
           <Message v-if="$form.employeeId?.invalid" severity="error" size="small" variant="simple">
             {{ $form.employeeId.error?.message }}
           </Message>
-        </div>
+        </div> -->
 
         <div class="w-full">
           <label class="block text-sm font-medium text-gray-700 mb-1">Bodega asignada</label>
