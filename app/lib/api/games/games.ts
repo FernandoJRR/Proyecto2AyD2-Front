@@ -34,6 +34,15 @@ export interface ScorePlayerPayload {
   shotsPlayer: number
 }
 
+export interface UpdatePlayersGame {
+  players: PlayersGamePayload[]
+}
+
+export interface PlayersGamePayload {
+  name: string
+  playerNumber: number
+}
+
 export const getAllGames = async () => {
   const response = await $api<Game[]>(`${CURRENT_GAME_URI}`, {
     method: "GET",
@@ -64,6 +73,14 @@ export const getScoreGame = async (game_id: string) => {
 
 export const updateScoreGame = async (game_id: string, payload: UpdateScoreGamePayload) => {
   const response = await $api<ScoresHoleResponse>(`${CURRENT_GAME_URI}/score/${game_id}`, {
+    method: "PATCH",
+    body: payload
+  });
+  return response;
+}
+
+export const updatePlayerGame = async (game_id: string, payload: UpdatePlayersGame) => {
+  const response = await $api<ScoresHoleResponse>(`${CURRENT_GAME_URI}/players/${game_id}`, {
     method: "PATCH",
     body: payload
   });
