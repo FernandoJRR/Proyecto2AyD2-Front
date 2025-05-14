@@ -55,6 +55,11 @@ const menus = [
     route: "/reservaciones",
   },
   {
+    title: "Juegos",
+    description: "Administracion de Juegos",
+    route: "/juegos",
+  },
+  {
     title: "Horarios",
     description: "Administracion de Horarios",
     route: "/horarios",
