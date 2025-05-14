@@ -35,21 +35,6 @@
           {{ $form.endTime.error?.message }}
         </Message>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Modalidad</label>
-          <Dropdown
-            id="online"
-            name="online"
-            :options="modalidadOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-            placeholder="Seleccionar modalidad"
-          />
-          <Message v-if="$form.online?.invalid" severity="error" size="small" variant="simple">
-            {{ $form.online.error?.message }}
-          </Message>
-        </div>
       </div>
 
       <div class="pt-4">
@@ -78,15 +63,10 @@ const route = useRoute()
 const scheduleId = route.params.id as string
 const isScheduleReady = ref(false)
 
-const modalidadOptions = [
-  { label: 'Virtual', value: true },
-  { label: 'Presencial', value: false }
-]
 
 const formInitialValues = ref<UpdateSchedule>({
   startTime: '',
-  endTime: '',
-  online: true
+  endTime: ''
 })
 
 const { data: foundedSchedule } = useCustomQuery<Schedule>({
@@ -100,8 +80,7 @@ watch(
     if (data) {
       formInitialValues.value = {
         startTime: data.startTime,
-        endTime: data.endTime,
-        online: data.online
+        endTime: data.endTime
       }
       isScheduleReady.value = true
     }
@@ -112,8 +91,7 @@ watch(
 const resolver = zodResolver(
   z.object({
     startTime: z.string().min(1, 'La hora de inicio es obligatoria'),
-    endTime: z.string().min(1, 'La hora de fin es obligatoria'),
-    online: z.boolean({ required_error: 'Debe seleccionar una modalidad' })
+    endTime: z.string().min(1, 'La hora de fin es obligatoria')
   })
 )
 
