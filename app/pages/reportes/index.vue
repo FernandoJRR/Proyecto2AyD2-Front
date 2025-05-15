@@ -7,8 +7,7 @@
 
 
             <!-- fechas-->
-            <template v-if="reportType === 'RESERVATIONS' || reportType === 'POPULAR_HOURS'
-                || reportType === 'RESERVATIONS_PROFIT'">
+            <template class="flex flex-row gap-5">
                 <DatePicker v-model="startDate" placeholder="Fecha de inicio" dateFormat="dd/mm/yy" class="w-full" />
                 <DatePicker v-model="endDate" placeholder="Fecha de fin" dateFormat="dd/mm/yy" class="w-full" />
             </template>
@@ -33,16 +32,6 @@
                     <div class="text-green-700 font-semibold"> {{
                         globalFinancialSummary.totalSales ? "Q " + globalFinancialSummary.totalSales : "-" }}</div>
                 </div>
-                <div class="p-3 rounded-lg bg-white border border-slate-200 shadow-sm">
-                    <span class="font-medium">Total de gastos:</span>
-                    <div class="text-red-700 font-semibold"> {{
-                        globalFinancialSummary.totalCost ? "Q " + globalFinancialSummary.totalCost : "-" }}</div>
-                </div>
-                <div class="p-3 rounded-lg bg-white border border-slate-200 shadow-sm">
-                    <span class="font-medium">Total de ganancias:</span>
-                    <div class="text-blue-700 font-semibold"> {{ globalFinancialSummary.totalProfit ?
-                        "Q " + globalFinancialSummary.totalProfit : "-" }}</div>
-                </div>
             </div>
         </div>
     </template>
@@ -50,6 +39,10 @@
 
     <div class="text-slate-700 font-semibold mb-3" v-if="totalReservations !== null">
         Total de reservaciones: {{ totalReservations }}
+    </div>
+
+    <div class="text-slate-700 font-semibold mb-3" v-if="totalAverange !== null">
+        Promedio General De Los Grupos: {{ totalAverange }}
     </div>
 
 
@@ -82,7 +75,7 @@
 import { ref, onMounted, render } from 'vue'
 import { toast } from 'vue-sonner';
 import { boolean } from 'zod';
-import { getReservationReport, exportReservationReport, getPopularHoursBetweenDates, exportPopularHoursBetweenDates, exportReservationProfitReport, createReservationProfitReport, exportNotShowReport } from '~/lib/api/reportes/reporte';
+import { getReservationReport, exportReservationReport, getPopularHoursBetweenDates, exportPopularHoursBetweenDates, exportReservationProfitReport, createReservationProfitReport, exportNotShowReport, getAveregangeTimeReport, exportAveregangeTimeReport, exportFrequentCustomersReport, createFrequentCustomersReport } from '~/lib/api/reportes/reporte';
 
 
 //esto indica que las rows seran reactivas, se podran modificar, y por lo tanto se puede cambiar el valor y vue lo detectara
@@ -127,11 +120,39 @@ const availableReports = [
     { value: 'POPULAR_HOURS', label: 'Reporte de Horarios con Mayor Demanda' },
     { value: 'RESERVATIONS_PROFIT', label: 'Reporte de Ingresos Por Reservaciones' },
     { value: 'NOT_SHOW', label: 'Reporte de No Shows' },
+    { value: 'AVERANGE_TIME', label: 'Reporte de Tiempo Promedio por Grupo' },
+    { value: 'FREQUENT', label: 'Reporte de Jugadores Frecuentes' },
 ]
 
 const totalReservations = ref<number | null>(null);
+const totalAverange = ref<number | null>(null);
 
 
+
+const frequentTable =
+{
+    dataKey: 'customerId',
+    reportHeader: 'Reporte de Tiempo Promedio por Grupo',
+    columns: [
+        { field: 'customerId', header: 'NIT' },
+        { field: 'customerFullName', header: 'Cliente' },
+        { field: 'totalVisits', header: 'Numero de visitas' }
+    ]
+}
+
+
+const averangeTableCOnfig =
+{
+    dataKey: 'date',
+    reportHeader: 'Reporte de Tiempo Promedio por Grupo',
+    columns: [
+        { field: 'date', header: 'Fecha' },
+        {
+            field: 'averageHours', header: 'Tiempo Promedio Por Grupo',
+            render: (row: any) => row.averageHours ? row.averageHours + 'h' : '-'
+        }
+    ]
+}
 
 
 
@@ -274,6 +295,25 @@ const cargarReporteActual = async () => {
                 reportData.value.data = notShow.popularHours;
                 totalReservations.value = notShow.totalReservations;
                 break;
+
+            case 'AVERANGE_TIME':
+                tableConfig.value = averangeTableCOnfig;
+                const averange = await getAveregangeTimeReport(
+                    startDate.value,
+                    endDate.value
+                );
+                reportData.value.data = averange.averangePerDates;
+                totalAverange.value = averange.globalHoursAverange;
+                break;
+
+            case 'FREQUENT':
+                tableConfig.value = frequentTable;
+                const frequent = await createFrequentCustomersReport(
+                    startDate.value,
+                    endDate.value
+                );
+                reportData.value.data = frequent;
+                break;
             default:
                 reportData.value.data = []
         }
@@ -313,6 +353,20 @@ const exportReports = async () => {
                 );
                 break;
 
+            case 'AVERANGE_TIME':
+                await exportAveregangeTimeReport(
+                    startDate.value,
+                    endDate.value
+                );
+                break;
+
+            case 'FREQUENT':
+                await exportFrequentCustomersReport(
+                    startDate.value,
+                    endDate.value
+                );
+                break;
+
             default:
         }
     } catch (error: any) {
@@ -322,6 +376,7 @@ const exportReports = async () => {
 
 watch(reportType, async () => {
     totalReservations.value = null;
+    totalAverange.value = null;
     await cargarReporteActual();
 });
 
