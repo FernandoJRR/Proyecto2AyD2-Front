@@ -61,7 +61,7 @@ export interface ItemType {
 }
 
 export interface PaymentMethod {
-  paymentMethod: string|null;
+  paymentMethod: string | null;
   name: string;
 }
 
@@ -81,8 +81,24 @@ export const mapModelCreateInvoiceToCreateInvoice = (
   };
 };
 
+/**
+ * Este método se encarga de crear una factura y reconoce el warehouse del usuario que la crea
+ * @param data
+ * @returns
+ */
 export const createInvoice = async (data: CreateInvoice) => {
   const response = await $api<Invoice>(`${CURRENT_INVOICE_URI}`, {
+    method: "POST",
+    body: data,
+  });
+  return response;
+};
+
+export const createInvoiceByWarehouseId = async (
+  data: CreateInvoice,
+  warehouseId: string
+) => {
+  const response = await $api<Invoice>(`${CURRENT_INVOICE_URI}/warehouse/${warehouseId}`, {
     method: "POST",
     body: data,
   });
