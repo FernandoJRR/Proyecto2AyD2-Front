@@ -1,4 +1,3 @@
-import { b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import type { Product } from "../products/product";
 import type { Entity } from "../utils/entity";
 
@@ -26,7 +25,7 @@ export interface CreatePackage {
     name:string;
     description:string;
     price:number;
-    details:CreatePackageDetail[];
+    packageDetail:CreatePackageDetail[];
     active:boolean;
 }
 

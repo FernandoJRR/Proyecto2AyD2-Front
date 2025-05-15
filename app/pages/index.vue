@@ -45,6 +45,21 @@ const menus = [
     route: "/productos",
   },
   {
+    title: "Stock",
+    description: "Administracion de Stock",
+    route: "/stocks",
+  },
+  {
+    title: "Entradas",
+    description: "Administracion de Entradas",
+    route: "/entradas",
+  },
+  {
+    title: "Salidas",
+    description: "Administracion de Salidas",
+    route: "/salidas",
+  },
+  {
     title: "Entradas Productos",
     description: "Administracion de Entradas de Productos",
     route: "/entradas_productos",
@@ -55,9 +70,24 @@ const menus = [
     route: "/reservaciones",
   },
   {
+    title: "Juegos",
+    description: "Administracion de Juegos",
+    route: "/juegos",
+  },
+  {
     title: "Horarios",
     description: "Administracion de Horarios",
     route: "/horarios",
+  },
+  {
+    title: "Paquetes",
+    description: "Administracion de Paquetes",
+    route: "/paquetes",
+  },
+  {
+    title: "Facturas",
+    description: "Administracion de Facturas",
+    route: "/facturacion",
   }
 ];
 

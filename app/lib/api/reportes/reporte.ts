@@ -1,71 +1,239 @@
-import type { Medicine } from "../medicines/medicine";
+const CURRENT_REPORTS_URI = "/v1";
 
-const CURRENT_REPORTS_URI = "/v1/reports";
-
-export async function getMedicinesReport(medicineName?: string) {
-  const params = {
-    medicationName: medicineName,
-  };
-  return await $api<Medicine[]>(`${CURRENT_REPORTS_URI}/getMedicationReport`, {
-    params,
-  });
-}
-
-export async function getMedicationProfitReport(
-  medicineName?: string,
+export async function getReservationReport(
   startDate?: Date | null,
   endDate?: Date | null
 ) {
   const params = {
-    medicationName: medicineName,
     startDate: startDate ? startDate.toISOString().split("T")[0] : null,
     endDate: endDate ? endDate.toISOString().split("T")[0] : null,
   };
-  return await $api<any>(`${CURRENT_REPORTS_URI}/getMedicationProfitReport`, {
-    params,
+  return await $api<any>(`${CURRENT_REPORTS_URI}/reservation-reports`, {
+    body: params,
+    method: "POST",
   });
 }
 
-export async function getEmployeeProfitReport(
-  employeeName?: string,
-  employeeCui?: string
-) {
-  const params = {
-    employeeName: employeeName,
-    employeeCUI: employeeCui,
-  };
-  return await $api<any>(`${CURRENT_REPORTS_URI}/getEmployeeProfitReport`, {
-    params,
-  });
-}
-
-export async function getEmployeeLifecycleReport(
-  employeTypeId?: string,
+export async function exportReservationReport(
   startDate?: Date | null,
-  endDate?: Date | null,
-  historyTypeIds?: string[]
+  endDate?: Date | null
 ) {
   const params = {
-    employeeTypeId: employeTypeId,
     startDate: startDate ? startDate.toISOString().split("T")[0] : null,
     endDate: endDate ? endDate.toISOString().split("T")[0] : null,
-    historyTypeIds: historyTypeIds,
   };
-  return await $api<any>(`${CURRENT_REPORTS_URI}/getEmployeeLifecycleReport`, {
-    params,
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/reservation-reports/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+
+
+/**
+ * reprte de horas opulares en dos fechas
+ */
+export async function getPopularHoursBetweenDates(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  return await $api<any>(`${CURRENT_REPORTS_URI}/popular-hours-report`, {
+    body: params,
+    method: "POST",
   });
 }
 
-export async function getDoctorAssignmentReport(
-  onlyAssigneds: boolean,
-  onlyNotAssigneds: boolean
+
+/**
+ * exporta reprte de horas opulares en dos fechas
+ */
+export async function exportPopularHoursBetweenDates(
+  startDate?: Date | null,
+  endDate?: Date | null
 ) {
   const params = {
-    onlyAssigneds: onlyAssigneds,
-    onlyNotAssigneds: onlyNotAssigneds,
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
   };
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/popular-hours-report/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
 
-  return await $api<any>(`${CURRENT_REPORTS_URI}/getDoctorAssignmentReport`, {
-    params,
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+
+
+
+export async function createReservationProfitReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  return await $api<any>(`${CURRENT_REPORTS_URI}/reservation-profit`, {
+    body: params,
+    method: "POST",
   });
+}
+
+
+export async function exportReservationProfitReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/reservation-profit/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+
+
+
+export async function createNotShowReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  return await $api<any>(`${CURRENT_REPORTS_URI}/reservation-not-show"`, {
+    body: params,
+    method: "POST",
+  });
+}
+
+
+
+export async function exportNotShowReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/reservation-not-show/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+
+
+export async function getAveregangeTimeReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  return await $api<any>(`${CURRENT_REPORTS_URI}/averange-time`, {
+    body: params,
+    method: "POST",
+  });
+}
+
+export async function exportAveregangeTimeReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/averange-time/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+
+export async function createFrequentCustomersReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  return await $api<any>(`${CURRENT_REPORTS_URI}/frequent-customers`, {
+    body: params,
+    method: "POST",
+  });
+}
+
+
+export async function exportFrequentCustomersReport(
+  startDate?: Date | null,
+  endDate?: Date | null
+) {
+  const params = {
+    startDate: startDate ? startDate.toISOString().split("T")[0] : null,
+    endDate: endDate ? endDate.toISOString().split("T")[0] : null,
+  };
+  const response = await $api<any>(
+    `${CURRENT_REPORTS_URI}/frequent-customers/export`,
+    {
+      body: params,
+      method: "POST",
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
 }

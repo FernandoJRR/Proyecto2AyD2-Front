@@ -123,10 +123,13 @@ import { toast } from 'vue-sonner';
 import { z } from 'zod';
 import { createEmployee, getEmployeeById, updateEmployee, updateEmployeeSalary, type EmployeePayload, type EmployeeSalaryUpdatePayload, type EmployeeUpdatePayload } from '~/lib/api/admin/employee';
 import { getAllEmployeeTypes } from '~/lib/api/admin/employee-type';
+import { useQueryCache } from '@pinia/colada'
+
+const queryCache = useQueryCache();
 
 const { state: foundUser } = useCustomQuery({
   key: ['usuario-editar', useRoute().params.id as string],
-  query: () => getEmployeeById(useRoute().params.id as string).then((res) => { return { ...res.employeeResponseDTO, username: res.username } })
+  query: () => getEmployeeById(useRoute().params.id as string).then((res) => { return { ...res.employeeResponseDTO, username: res.username } }),
 })
 
 const initialValues = reactive({
@@ -157,14 +160,13 @@ watch(
       initialValues.firstName = data.firstName;
       initialValues.lastName = data.lastName;
       initialValues.salary = data.salary;
-      // update the rest accordingly…
+
       initialValues.has_porcentaje_igss = data.igssPercentage != null;
       initialValues.igssPercentage = data.igssPercentage ?? 0;
       initialValues.has_porcentaje_irtra = data.irtraPercentage != null;
       initialValues.irtraPercentage = data.irtraPercentage ?? 0;
       initialValues.type = data.employeeType?.id ?? '';
       initialValues.username = data.username;
-      // etc.
     }
   },
   { immediate: true }
@@ -272,7 +274,7 @@ const onBenefitsFormSubmit = (e: any) => {
       cui: foundUser.value.data?.cui ?? '',
       salary: foundUser.value.data?.salary ?? 0,
       igssPercentage: e.values.has_porcentaje_igss ? e.values.igssPercentage : null,
-      irtraPercentage: e.values.has_porcentaje_igss ? e.values.irtraPercentage : null,
+      irtraPercentage: e.values.has_porcentaje_irtra ? e.values.irtraPercentage : null,
       employeeTypeId: { id: foundUser.value.data?.employeeType.id ?? '' },
     }
     updateEmployeeMutation(payload)
@@ -293,6 +295,10 @@ const { mutate: updateEmployeeMutation } = useMutation({
   },
   onSuccess() {
     toast.success('Empleado actualizado correctamente')
+    queryCache.invalidateQueries({
+      key: ['usuario-editar', useRoute().params.id as string],
+      exact: true,
+    });
     navigateTo('/admin/personal')
   }
 })
@@ -306,6 +312,10 @@ const { mutate: updateSalary } = useMutation({
   },
   onSuccess() {
     toast.success('Salario editado correctamente')
+    queryCache.invalidateQueries({
+      key: ['usuario-editar', useRoute().params.id as string],
+      exact: true,
+    });
     navigateTo('/admin/personal')
   }
 })
@@ -319,6 +329,10 @@ const { mutate } = useMutation({
   },
   onSuccess() {
     toast.success('Empleado creado correctamente')
+    queryCache.invalidateQueries({
+      key: ['usuario-editar', useRoute().params.id as string],
+      exact: true,
+    });
     navigateTo('/admin/personal')
   }
 })

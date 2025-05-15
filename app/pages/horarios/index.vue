@@ -17,49 +17,25 @@
       </template>
 
       <Column header="Inicio" field="startTime">
-        <template #filter>
-          <InputText
-            v-model="spec.startTime"
-            placeholder="Filtrar por hora inicio"
-            class="w-full"
-            @input="refetch()"
-          />
-        </template>
         <template #body="{ data }">
           {{ data.startTime ?? '—' }}
         </template>
       </Column>
 
       <Column header="Fin" field="endTime">
-        <template #filter>
+        <!-- <template #filter>
           <InputText
             v-model="spec.endTime"
             placeholder="Filtrar por hora fin"
             class="w-full"
             @input="refetch()"
           />
-        </template>
+        </template> -->
         <template #body="{ data }">
           {{ data.endTime ?? '—' }}
         </template>
       </Column>
 
-      <Column header="Modalidad" field="online">
-        <template #filter>
-          <Dropdown
-            v-model="spec.online"
-            :options="modalidadOptions"
-            placeholder="Filtrar modalidad"
-            class="w-full"
-            optionLabel="label"
-            optionValue="value"
-            @change="refetch()"
-          />
-        </template>
-        <template #body="{ data }">
-          <Tag :value="data.online ? 'Virtual' : 'Presencial'" />
-        </template>
-      </Column>
 
       <Column header="Acciones">
         <template #body="{ data }">
@@ -91,7 +67,7 @@ import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import { toast } from "vue-sonner";
 import {
-  getAllOnlineStatus,
+  getAllSchedules,
   deleteSchedule,
   type Schedule,
 } from "~/lib/api/schedules/schedule";
@@ -102,26 +78,17 @@ const queryCache = useQueryCache();
 const spec = reactive<{
   startTime: string | null;
   endTime: string | null;
-  online: boolean | null;
 }>({
   startTime: null,
-  endTime: null,
-  online: null,
+  endTime: null
 });
 
-const modalidadOptions = [
-  { label: "Todas", value: null },
-  { label: "Virtual", value: true },
-  { label: "Presencial", value: false },
-];
 
 const { state, asyncStatus, refetch } = useCustomQuery({
   key: ["getAllSchedules", spec],
   query: async () => {
-    if (spec.online !== null) return await getAllOnlineStatus(spec.online);
-    const allTrue = await getAllOnlineStatus(true);
-    const allFalse = await getAllOnlineStatus(false);
-    return [...allTrue, ...allFalse];
+   const all = await getAllSchedules();
+    return all;
   },
 });
 
