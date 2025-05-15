@@ -1,3 +1,4 @@
+import type { PlayersGamePayload } from "../games/games";
 import type { Entity } from "../utils/entity";
 
 const CURRENT_RESERVATION_URI = "/v1/reservations";
@@ -8,8 +9,8 @@ export interface Reservation extends Entity {
   gameId: string;
   startTime: string;
   endTime: string;
-  customerFullname: string;
-  customerNit: string;
+  customerFullName: string;
+  customerNIT: string;
   date: string;
   notShow: boolean;
   paid: boolean;
@@ -21,8 +22,8 @@ export interface SpecReservation {
   gameId: string | null;
   startTime: string | null;
   endTime: string | null;
-  customerFullname: string | null;
-  customerNit: string | null;
+  customerFullName: string | null;
+  customerNIT: string | null;
   date: string | null;
   notShow: boolean | null;
   paid: boolean | null;
@@ -33,7 +34,7 @@ export interface CreateReservation {
   endTime: string;
   date: string;
   customerNIT: string;
-  customerFullName:string;
+  customerFullName: string;
   createInvoiceRequestDTO: BillingDetailsRequest
 }
 
@@ -52,8 +53,30 @@ export interface DetailBilling {
 
 }
 
+export interface CreateReservationOnline {
+  startTime: string;
+  endTime: string;
+  date: string;
+  customerNIT: string;
+  customerFullName: string;
+  players: PlayersGamePayload[]
+}
+
+export interface PayReservationPayload {
+  reservationId: string
+  createInvoiceRequestDTO: BillingDetailsRequest
+}
+
 export const createReservation = async (data: CreateReservation) => {
   const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/presential`, {
+    method: "POST",
+    body: data,
+  });
+  return response;
+};
+
+export const createReservationOnline = async (data: CreateReservationOnline) => {
+  const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/online`, {
     method: "POST",
     body: data,
   });
@@ -70,11 +93,12 @@ export const cancelReservation = async (id: string) => {
   return response;
 };
 
-export const payReservation = async (id: string) => {
+export const payReservation = async (data: PayReservationPayload) => {
   const response = await $api<Reservation>(
-    `${CURRENT_RESERVATION_URI}/pay/${id}`,
+    `${CURRENT_RESERVATION_URI}/pay`,
     {
       method: "PATCH",
+      body: data
     }
   );
   return response;
