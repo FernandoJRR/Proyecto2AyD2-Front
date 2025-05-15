@@ -196,17 +196,17 @@ import { getPaymentMethods, type PaymentMethod } from '~/lib/api/invoices/invoic
 
 const stepIndex = ref(1);
 
+const selectedSchedule = ref<Schedule | null>(null);
+const selectedPackage = ref<Package | null>(null);
+
 const form = reactive({
   date: "",
   startTime: "",
   endTime: "",
   customerNIT: "",
   customerFullName: "",
-  selectedPackageId: null as number | null,
+  selectedPackageId: "",
 });
-
-const selectedSchedule = ref<Schedule | null>(null);
-const selectedPackage = ref<Package | null>(null);
 
 
 const validateStep1 = (next: Function) => {
@@ -230,9 +230,26 @@ const onFormSubmit = async () => {
     ...form,
     startTime,
     endTime,
+    createInvoiceRequestDTO: {
+      paymentMethod: selectedPaymentMethod.value,
+      clientDocument: form.customerNIT,
+      //Primero viene el paquete en el detalle
+      details: [
+        {
+          itemId: selectedPackage.value?.id!,
+          itemName: selectedPackage.value?.name!,
+          itemType: "SERVICE",
+          quantity: 1,
+          unitPrice: selectedPackage.value?.price!
+        }
+      ]
+    }
   };
 
   try {
+    console.log("PAYLOAD")
+    console.log(payload)
+    console.log(extraDetails.value)
     await createReservation(payload);
     toast.success("Reservación creada correctamente");
     navigateTo("/reservaciones/");
@@ -267,15 +284,6 @@ const scheduleOptions = computed(() =>
     value: s
   }))
 );
-
-
-
-
-
-
-
-
-
 
 /**pAra el paso 4 */
 
@@ -332,6 +340,10 @@ const totalExtras = computed(() =>
 const totalInvoice = computed(() =>
   (selectedPackage.value?.price ?? 0) + totalExtras.value
 )
+
+watch(selectedPackage, (newPackage) => {
+  form.selectedPackageId = newPackage?.id ?? '';
+});
 
 
 onMounted(async () => {
