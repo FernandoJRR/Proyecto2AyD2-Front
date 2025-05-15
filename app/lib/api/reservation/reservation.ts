@@ -1,3 +1,4 @@
+import type { PlayersGamePayload } from "../games/games";
 import type { Entity } from "../utils/entity";
 
 const CURRENT_RESERVATION_URI = "/v1/reservations";
@@ -33,7 +34,7 @@ export interface CreateReservation {
   endTime: string;
   date: string;
   customerNIT: string;
-  customerFullName:string;
+  customerFullName: string;
   createInvoiceRequestDTO: BillingDetailsRequest
 }
 
@@ -52,8 +53,25 @@ export interface DetailBilling {
 
 }
 
+export interface CreateReservationOnline {
+  startTime: string;
+  endTime: string;
+  date: string;
+  customerNIT: string;
+  customerFullName: string;
+  players: PlayersGamePayload[]
+}
+
 export const createReservation = async (data: CreateReservation) => {
   const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/presential`, {
+    method: "POST",
+    body: data,
+  });
+  return response;
+};
+
+export const createReservationOnline = async (data: CreateReservationOnline) => {
+  const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/online`, {
     method: "POST",
     body: data,
   });

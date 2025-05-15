@@ -1,16 +1,16 @@
 <template>
   <div class="p-8 max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold mb-6">Crear una reservación en linea</h1>
+    <h1 class="text-4xl font-bold mb-6">Crear una reservación</h1>
 
-    <Stepper v-model:value="stepIndex" class="" linear>
+    <Stepper v-model:value="stepIndex" class="p-10" linear>
       <StepList>
         <Step :value="1">Datos</Step>
-        <Step :value="2">Paquete</Step>
-        <Step :value="3">Agrega mas Productos</Step>
+        <Step :value="2">Agrega Items</Step>
+        <Step :value="3">Ingresa a los Jugadores</Step>
         <Step :value="4">Facturacion</Step>
       </StepList>
 
-      <StepPanels class="mt-6">
+      <StepPanels>
         <!-- Paso 1 -->
         <StepPanel :value="1" v-slot="{ activateCallback }">
           <div class="space-y-6">
@@ -44,11 +44,15 @@
         <!-- Paso 2 -->
         <StepPanel :value="2" v-slot="{ activateCallback }">
           <div class="space-y-6">
-            <Dropdown v-model="selectedPackage" :options="packageOptions" optionLabel="label" optionValue="value"
-              placeholder="Elegir paquete" class="w-full" />
-            <Button label="Quitar selección" icon="pi pi-times" severity="danger" outlined class="mt-2"
-              @click="selectedPackage = null" />
-
+            <h2 class="text-2xl font-semibold">Agrega Items a tu Juego</h2>
+            <div class="flex flex-row gap-x-2 items-center justify-center">
+              <div class="w-full">
+                <label class="block text-sm font-medium mb-1">Paquete</label>
+                <Dropdown v-model="selectedPackage" :options="packageOptions" optionLabel="label" optionValue="value"
+                  placeholder="Elegir paquete" class="w-full" />
+              </div>
+              <Button class="mt-6 w-full" label="Agregar" icon="pi pi-plus" outlined @click="addDetailPackage" />
+            </div>
 
             <div v-if="selectedPackage?.packageDetail?.length">
               <h3 class="text-xl font-semibold mb-2">Precio: Q{{ selectedPackage.price }} - Productos incluidos:</h3>
@@ -58,22 +62,8 @@
                 </li>
               </ul>
             </div>
-
-            <div class="pt-4 flex justify-between">
-              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
-              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(3)" />
-            </div>
-          </div>
-        </StepPanel>
-
-        <!-- Paso 3 -->
-
-        <StepPanel :value="3" v-slot="{ activateCallback }">
-          <div class="space-y-6">
-            <h2 class="text-2xl font-semibold">Agregar Productos Adicionales</h2>
-
-            <div class="grid md:grid-cols-2 gap-4 items-end">
-              <div>
+            <div class="flex flex-row gap-x-2 items-center justify-center">
+              <div class="w-full">
                 <label class="block text-sm font-medium mb-1">Producto</label>
                 <Dropdown v-model="tempDetail.itemId" :options="itemOptions" optionLabel="name" optionValue="id"
                   placeholder="Seleccionar producto" class="w-full" @change="updatePrice" />
@@ -82,15 +72,13 @@
                 <label class="block text-sm font-medium mb-1">Cantidad</label>
                 <InputNumber v-model="tempDetail.quantity" :min="1" class="w-full" />
               </div>
-              <div class="md:col-span-2 text-right">
-                <Button label="Agregar" icon="pi pi-plus" outlined @click="addDetail" />
-              </div>
+              <Button class="mt-6 w-full" label="Agregar" icon="pi pi-plus" outlined @click="addDetail" />
             </div>
             <div class="max-h-40 overflow-y-auto">
               <DataTable :value="extraDetails" class="">
                 <Column header="Producto">
                   <template #body="{ data }">
-                    {{ itemMap[data.itemId]?.name ?? '—' }}
+                    {{ data.itemName }}
                   </template>
                 </Column>
                 <Column header="Cantidad" field="quantity" />
@@ -113,12 +101,39 @@
             </div>
 
             <div class="pt-4 flex justify-between">
-              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(2)" severity="secondary" />
-              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(4)" />
+              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
+              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(3)" />
             </div>
           </div>
         </StepPanel>
 
+        <StepPanel :value="3" v-slot="{ activateCallback }">
+          <div class="space-y-6">
+            <div v-for="(name, index) in newPlayers" :key="index"
+              class="border rounded-xl p-4 shadow-sm bg-white hover:shadow-md transition-shadow">
+              <div class="flex items-center gap-3 w-full">
+                <div
+                  class="bg-green-100 text-main-green rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                  {{ index + 1 }}
+                </div>
+                <input v-model="newPlayers[index]" type="text" class="flex-1 px-3 py-2 rounded w-full"
+                  :placeholder="`Nombre del Jugador ${index + 1}`" required />
+              </div>
+            </div>
+
+            <div class="flex flex-row gap-x-2 mt-4">
+              <Button class="w-full" label="Agregar" @click="addPlayer" :disabled="newPlayers.length >= 4"
+                icon="pi pi-plus" />
+              <Button class="w-full" label="Quitar" @click="removePlayer" :disabled="newPlayers.length <= 1"
+                icon="pi pi-minus" />
+            </div>
+
+            <div class="pt-4 flex justify-between">
+              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(2)" severity="secondary" />
+              <Button label="Siguiente" icon="pi pi-arrow-right" @click="validateStep3(activateCallback)" />
+            </div>
+          </div>
+        </StepPanel>
 
 
         <!-- Paso 4 -->
@@ -179,12 +194,12 @@ import StepPanel from 'primevue/steppanel';
 import { toast } from "vue-sonner";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
-import { createReservation } from "~/lib/api/reservation/reservation";
+import { createReservation, createReservationOnline } from "~/lib/api/reservation/reservation";
 import {
   getAllSchedules,
   type Schedule,
 } from "~/lib/api/schedules/schedule";
-import type { CreateReservation } from "~/lib/api/reservation/reservation";
+import type { CreateReservation, CreateReservationOnline } from "~/lib/api/reservation/reservation";
 import { getAllPackages, type Package } from "~/lib/api/package/package";
 import { getAllProducts } from '~/lib/api/products/product';
 import { getPaymentMethods, type PaymentMethod } from '~/lib/api/invoices/invoice';
@@ -213,6 +228,14 @@ const validateStep1 = (next: Function) => {
   next(2); // avanzar al paso 2
 };
 
+const validateStep3 = (next: Function) => {
+  if (!canSubmitPlayers) {
+    toast.error("Debe de ingresar jugadores validos");
+    return;
+  }
+  next(4); // avanzar al paso 2
+};
+
 
 const onFormSubmit = async () => {
   if (!form.date || !form.customerNIT || !form.customerFullName || !selectedSchedule.value) {
@@ -222,31 +245,27 @@ const onFormSubmit = async () => {
 
   const { startTime, endTime } = selectedSchedule.value;
 
-  const payload: CreateReservation = {
+  const registeredPlayers = newPlayers.value.map((name, i) => ({
+    name,
+    playerNumber: i + 1,
+  }))
+  const payload: CreateReservationOnline = {
     ...form,
     startTime,
     endTime,
-    createInvoiceRequestDTO: {
-      paymentMethod: selectedPaymentMethod.value,
-      clientDocument: form.customerNIT,
-      //Primero viene el paquete en el detalle
-      details: [
-        {
-          itemId: selectedPackage.value?.id!,
-          itemName: selectedPackage.value?.name!,
-          itemType: "SERVICE",
-          quantity: 1,
-          unitPrice: selectedPackage.value?.price!
-        }
-      ]
-    }
+    players: registeredPlayers
   };
 
   try {
     console.log("PAYLOAD")
     console.log(payload)
     console.log(extraDetails.value)
-    await createReservation(payload);
+    const response = await createReservationOnline(payload);
+
+    const blob = new Blob([response as any], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+
     toast.success("Reservación creada correctamente");
     navigateTo("/reservaciones/");
   } catch (error: any) {
@@ -256,6 +275,21 @@ const onFormSubmit = async () => {
   }
 };
 
+const newPlayers = ref<string[]>([''])
+
+const addPlayer = () => {
+  if (newPlayers.value.length < 4) newPlayers.value.push('')
+}
+
+const removePlayer = () => {
+  if (newPlayers.value.length > 1) newPlayers.value.pop()
+}
+
+const canSubmitPlayers = computed(() =>
+  newPlayers.value.length >= 1 &&
+  newPlayers.value.length <= 4 &&
+  newPlayers.value.every(name => name.trim().length > 0)
+)
 
 const { data: packages } = useCustomQuery({
   key: ['getAllPackages'],
@@ -289,11 +323,12 @@ const itemMap = ref<Record<string, { name: string; price: number }>>({})
 
 const tempDetail = reactive({
   itemId: '',
+  itemName: '',
   quantity: 1,
   unitPrice: 0
 })
 
-const extraDetails = ref<{ itemId: string; quantity: number; unitPrice: number }[]>([])
+const extraDetails = ref<{ itemId: string; itemName: string; itemType: string; quantity: number; unitPrice: number }[]>([])
 
 const addDetail = () => {
   const item = itemMap.value[tempDetail.itemId]
@@ -305,6 +340,8 @@ const addDetail = () => {
   //agregamos la seleccion al array
   extraDetails.value.push({
     itemId: tempDetail.itemId,
+    itemName: itemMap.value[tempDetail.itemId]?.name ?? '—',
+    itemType: "GOOD",
     quantity: tempDetail.quantity,
     unitPrice: item.price
   })
@@ -313,6 +350,25 @@ const addDetail = () => {
   tempDetail.itemId = ''
   tempDetail.quantity = 1
   tempDetail.unitPrice = 0
+}
+
+const addDetailPackage = () => {
+  if (!selectedPackage) {
+    toast.warning('Seleccione un paquete')
+    return
+  }
+
+  //agregamos la seleccion al array
+  extraDetails.value.push({
+    itemId: selectedPackage.value!.id,
+    itemName: selectedPackage.value!.name,
+    itemType: "SERVICE",
+    quantity: 1,
+    unitPrice: selectedPackage.value!.price
+  })
+
+  //reiniciamos valores
+  selectedPackage.value = null
 }
 
 const updatePrice = () => {
