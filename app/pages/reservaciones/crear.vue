@@ -250,7 +250,12 @@ const onFormSubmit = async () => {
     console.log("PAYLOAD")
     console.log(payload)
     console.log(extraDetails.value)
-    await createReservation(payload);
+    const response = await createReservation(payload);
+
+    const blob = new Blob([response as any], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+
     toast.success("Reservación creada correctamente");
     navigateTo("/reservaciones/");
   } catch (error: any) {
