@@ -16,7 +16,7 @@ const { user } = storeToRefs(useAuthStore());
 const menus = [
   {
     title: "Administracion",
-    description: "Administracion General del Hospital",
+    description: "Administracion General",
     route: "/admin",
   },
   {
