@@ -2,11 +2,10 @@ import { storeToRefs } from 'pinia'
 import { toast } from 'vue-sonner'
 
 export default defineNuxtRouteMiddleware((to, _from) => {
-  const { user } = storeToRefs(useAuthStore())
-
   if (to.path === '/example') return
 
   if(to.fullPath.includes('public')) return
+  if(to.fullPath.includes('juegos')) return
 
   const token = useCookie('proyecto2ayd2-user-token')
 
