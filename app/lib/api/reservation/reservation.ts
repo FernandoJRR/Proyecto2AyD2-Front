@@ -34,10 +34,26 @@ export interface CreateReservation {
   date: string;
   customerNIT: string;
   customerFullName:string;
+  createInvoiceRequestDTO: BillingDetailsRequest
+}
+
+export interface BillingDetailsRequest {
+  paymentMethod: string
+  clientDocument: string
+  details: DetailBilling[]
+}
+
+export interface DetailBilling {
+  itemId: string
+  itemName: string
+  itemType: string
+  quantity: number
+  unitPrice: number
+
 }
 
 export const createReservation = async (data: CreateReservation) => {
-  const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}`, {
+  const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/presential`, {
     method: "POST",
     body: data,
   });
