@@ -5,6 +5,7 @@ const CURRENT_STOK_URI = "/v1/stocks";
 
 export interface Stock extends Entity {
     id:string;
+    productId:string;
     quantity:number;
     minimumStock:number;
     warehouse:Warehouse;
