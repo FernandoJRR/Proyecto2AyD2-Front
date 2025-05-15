@@ -46,7 +46,9 @@
 
       <div>
         <p class="font-medium text-gray-600">Estado de pago</p>
-        <Tag :severity="reservation.paid ? 'success' : 'warning'" :value="reservation.paid ? 'Pagada' : 'No pagada'" />
+        <Tag v-if="!reservation.notShow && reservation.paid" severity="info" value="Asistió" />
+        <Tag v-else-if="!reservation.notShow && !reservation.paid" severity="warn" value="Programada" />
+        <Tag v-else-if="reservation.notShow" severity="danger" value="Cancelada" />
       </div>
 
       <div>
@@ -60,7 +62,8 @@
       Cargando reservación...
     </div>
   </div>
-  <div v-if="!reservation?.paid" class="p-8 max-w-4xl mx-auto bg-white shadow-md rounded-2xl border border-gray-200">
+  <div v-if="!reservation?.paid && !reservation?.notShow"
+    class="p-8 mt-4 max-w-4xl mx-auto bg-white shadow-md rounded-2xl border border-gray-200">
     <div class="mb-6 flex justify-between items-center">
       <h1 class="text-3xl font-bold">Completar Reservacion</h1>
     </div>
@@ -133,7 +136,6 @@
               </div>
 
               <div class="pt-4 flex justify-between">
-                <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
                 <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(2)" />
               </div>
             </div>
@@ -177,7 +179,7 @@
 
               <!-- Acciones -->
               <div class="pt-4 flex justify-between">
-                <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(2)" severity="secondary" />
+                <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
                 <Button label="Completar Reservación" icon="pi pi-save" @click="onFormSubmit" />
               </div>
             </div>
