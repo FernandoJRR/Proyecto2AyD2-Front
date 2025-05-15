@@ -74,7 +74,7 @@
           </template>
         </Column>
 
-        <Column header="" field="notShow">
+        <Column header="Asistencia" field="notShow">
           <template #filter>
             <Dropdown v-model="spec.notShow" :options="booleanOptions" class="w-full" placeholder="Filtrar cancelación"
               optionLabel="label" optionValue="value" @change="refetch()" />
