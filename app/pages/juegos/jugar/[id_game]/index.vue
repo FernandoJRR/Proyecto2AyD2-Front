@@ -58,6 +58,7 @@ import { getGameById, updatePlayerGame, type Game, type UpdatePlayersGame } from
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useQueryCache } from '@pinia/colada'
+definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const queryCache = useQueryCache()
