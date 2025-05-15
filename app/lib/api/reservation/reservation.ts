@@ -9,8 +9,8 @@ export interface Reservation extends Entity {
   gameId: string;
   startTime: string;
   endTime: string;
-  customerFullname: string;
-  customerNit: string;
+  customerFullName: string;
+  customerNIT: string;
   date: string;
   notShow: boolean;
   paid: boolean;
@@ -22,8 +22,8 @@ export interface SpecReservation {
   gameId: string | null;
   startTime: string | null;
   endTime: string | null;
-  customerFullname: string | null;
-  customerNit: string | null;
+  customerFullName: string | null;
+  customerNIT: string | null;
   date: string | null;
   notShow: boolean | null;
   paid: boolean | null;
@@ -62,6 +62,11 @@ export interface CreateReservationOnline {
   players: PlayersGamePayload[]
 }
 
+export interface PayReservationPayload {
+  reservationId: string
+  createInvoiceRequestDTO: BillingDetailsRequest
+}
+
 export const createReservation = async (data: CreateReservation) => {
   const response = await $api<Reservation>(`${CURRENT_RESERVATION_URI}/presential`, {
     method: "POST",
@@ -88,11 +93,12 @@ export const cancelReservation = async (id: string) => {
   return response;
 };
 
-export const payReservation = async (id: string) => {
+export const payReservation = async (data: PayReservationPayload) => {
   const response = await $api<Reservation>(
-    `${CURRENT_RESERVATION_URI}/pay/${id}`,
+    `${CURRENT_RESERVATION_URI}/pay`,
     {
       method: "PATCH",
+      body: data
     }
   );
   return response;

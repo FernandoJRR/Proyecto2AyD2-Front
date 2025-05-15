@@ -50,18 +50,18 @@
 
         <Column header="Usuario" field="customerFullname">
           <template #filter>
-            <InputText v-model="spec.customerFullname" class="w-full" placeholder="Filtrar por usuario"
+            <InputText v-model="spec.customerFullName" class="w-full" placeholder="Filtrar por usuario"
               @input="refetch()" />
           </template>
-          <template #body="{ data }">{{ data.customerFullname ?? "error" }}</template>
+          <template #body="{ data }">{{ data.customerFullName ?? "error" }}</template>
         </Column>
 
 
         <Column header="Usuario NIT" field="customerNit">
           <template #filter>
-            <InputText v-model="spec.customerNit" class="w-full" placeholder="Filtrar por usuario" @input="refetch()" />
+            <InputText v-model="spec.customerNIT" class="w-full" placeholder="Filtrar por usuario" @input="refetch()" />
           </template>
-          <template #body="{ data }">{{ data.customerNit ?? "error" }}</template>
+          <template #body="{ data }">{{ data.customerNIT ?? "error" }}</template>
         </Column>
 
         <Column header="Pagado" field="paid">
@@ -91,8 +91,6 @@
             </router-link>
             <Button label="Cancelar" icon="pi pi-times" severity="danger" text rounded :disabled="data.cancelled"
               @click="cancel(data.id)" />
-            <Button label="Pagar" icon="pi pi-dollar" severity="success" text rounded
-              :disabled="data.paid || data.cancelled" @click="pay(data.id)" />
           </template>
         </Column>
 
@@ -127,8 +125,8 @@ const spec = reactive<SpecReservation>({
   gameId: null,
   startTime: null,
   endTime: null,
-  customerFullname: null,
-  customerNit: null,
+  customerFullName: null,
+  customerNIT: null,
   date: null,
   notShow: null,
   paid: null,
