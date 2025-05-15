@@ -7,7 +7,8 @@
 
 
             <!-- fechas-->
-            <template v-if="reportType === 'RESERVATIONS' || reportType === 'POPULAR_HOURS'">
+            <template v-if="reportType === 'RESERVATIONS' || reportType === 'POPULAR_HOURS'
+                || reportType === 'RESERVATIONS_PROFIT'">
                 <DatePicker v-model="startDate" placeholder="Fecha de inicio" dateFormat="dd/mm/yy" class="w-full" />
                 <DatePicker v-model="endDate" placeholder="Fecha de fin" dateFormat="dd/mm/yy" class="w-full" />
             </template>
@@ -23,7 +24,7 @@
         </div>
     </div>
 
-    <template v-if="(reportType === 'FINANCIAL_REPORT') && globalFinancialSummary">
+    <template v-if="(reportType === 'RESERVATIONS_PROFIT') && globalFinancialSummary">
         <div class="p-4 mb-4 rounded-xl border border-slate-300 bg-slate-50 shadow-sm">
             <h3 class="text-slate-800 text-lg font-semibold mb-3">Resumen financiero global</h3>
             <div class="grid grid-cols-3 gap-4 text-sm text-slate-700">
@@ -81,7 +82,7 @@
 import { ref, onMounted, render } from 'vue'
 import { toast } from 'vue-sonner';
 import { boolean } from 'zod';
-import { getReservationReport, exportReservationReport, getPopularHoursBetweenDates, exportPopularHoursBetweenDates } from '~/lib/api/reportes/reporte';
+import { getReservationReport, exportReservationReport, getPopularHoursBetweenDates, exportPopularHoursBetweenDates, exportReservationProfitReport, createReservationProfitReport, exportNotShowReport } from '~/lib/api/reportes/reporte';
 
 
 //esto indica que las rows seran reactivas, se podran modificar, y por lo tanto se puede cambiar el valor y vue lo detectara
@@ -124,6 +125,8 @@ const reportData = ref<{
 const availableReports = [
     { value: 'RESERVATIONS', label: 'Reporte de Reservaciones' },
     { value: 'POPULAR_HOURS', label: 'Reporte de Horarios con Mayor Demanda' },
+    { value: 'RESERVATIONS_PROFIT', label: 'Reporte de Ingresos Por Reservaciones' },
+    { value: 'NOT_SHOW', label: 'Reporte de No Shows' },
 ]
 
 const totalReservations = ref<number | null>(null);
@@ -134,21 +137,38 @@ const totalReservations = ref<number | null>(null);
 
 const reservationsTableCOnfig =
 {
-    dataKey: 'id',
-    reportHeader: 'Reporte de Reservas',
+    dataKey: 'reservationId',
+    reportHeader: 'Reporte de Reservas No Shows',
     columns: [
         { field: 'id', header: 'Id' },
         { field: 'date', header: 'Fecha' },
         { field: 'startTime', header: 'Hora inicio' },
         { field: 'endTime', header: 'Hora final' },
+        { field: 'customerFullName', header: 'Cliente' },
+        { field: 'customerNIT', header: 'NIT' },
         {
-            field: 'paid', header: 'Pagado',
-            render: (row: any) => row.isPaid ? 'Si' : 'No'
-        },
+            field: 'notShow', header: 'Asistencia',
+            render: (row: any) => row.notShow ? 'No se presentó' : 'Asistió'
+        }
+    ]
+}
+
+const reservationProfitTableConfig =
+{
+    dataKey: 'reservationId',
+    reportHeader: 'Reporte de Ingresos Por Reservaciones',
+    columns: [
+        { field: 'reservationId', header: 'Id' },
+        { field: 'date', header: 'Fecha' },
+        { field: 'startTime', header: 'Hora inicio' },
+        { field: 'endTime', header: 'Hora final' },
+        { field: 'customerFullName', header: 'Cliente' },
+        { field: 'customerNIT', header: 'NIT' },
+        { field: 'paymentMethod', header: 'Metodo de pago' },
         {
-            field: 'cancelled', header: 'Cancelado',
-            render: (row: any) => row.isPaid ? 'Si' : 'No'
-        },
+            field: 'total', header: 'Total de la venta',
+            render: (row: any) => row.total ? 'Q ' + row.total : '-'
+        }
     ]
 }
 
@@ -164,6 +184,21 @@ const popularHoursTableConfig =
     ]
 }
 
+
+const notShowTableConfig =
+{
+    dataKey: 'reservationId',
+    reportHeader: 'Reporte de Reservas No Shows',
+    columns: [
+        { field: 'reservationId', header: 'Id' },
+        { field: 'date', header: 'Fecha' },
+        { field: 'startTime', header: 'Hora inicio' },
+        { field: 'endTime', header: 'Hora final' },
+        { field: 'customerFullName', header: 'Cliente' },
+        { field: 'customerNIT', header: 'NIT' },
+        { field: 'notShow', header: 'No Se presento?' }
+    ]
+}
 
 
 /**
@@ -216,6 +251,29 @@ const cargarReporteActual = async () => {
                 reportData.value.data = popularHours.popularHours;
                 totalReservations.value = popularHours.totalReservations;
                 break;
+            case 'RESERVATIONS_PROFIT':
+                tableConfig.value = reservationProfitTableConfig;
+                const reservationsProfit = await createReservationProfitReport(
+                    startDate.value,
+                    endDate.value
+                );
+                reportData.value.data = reservationsProfit.reservations;
+                globalFinancialSummary.value = {
+                    totalSales: reservationsProfit.totalProfit,
+                    totalProfit: 0,
+                    totalCost: 0,
+                }
+                break;
+
+            case 'NOT_SHOW':
+                tableConfig.value = notShowTableConfig;
+                const notShow = await createReservationProfitReport(
+                    startDate.value,
+                    endDate.value
+                );
+                reportData.value.data = notShow.popularHours;
+                totalReservations.value = notShow.totalReservations;
+                break;
             default:
                 reportData.value.data = []
         }
@@ -241,6 +299,20 @@ const exportReports = async () => {
                     endDate.value
                 );
                 break;
+
+            case 'RESERVATIONS_PROFIT':
+                await exportReservationProfitReport(
+                    startDate.value,
+                    endDate.value
+                );
+                break;
+            case 'NOT_SHOW':
+                await exportNotShowReport(
+                    startDate.value,
+                    endDate.value
+                );
+                break;
+
             default:
         }
     } catch (error: any) {
@@ -249,6 +321,7 @@ const exportReports = async () => {
 }
 
 watch(reportType, async () => {
+    totalReservations.value = null;
     await cargarReporteActual();
 });
 
