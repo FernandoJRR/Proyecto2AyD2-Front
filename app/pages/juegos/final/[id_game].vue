@@ -1,6 +1,6 @@
 <template>
-  <div class="p-6 max-w-3xl mx-auto text-center">
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">🏆 Resultado Final 🏆</h1>
+  <div class="w-80 lg:w-full p-6 text-center">
+    <h1 class="text-2xl font-bold mb-8 text-gray-800">🏆Resultado Final🏆</h1>
 
     <div v-if="sortedScores.length" class="space-y-4">
       <div v-for="(player, index) in sortedScores" :key="player.id" :class="[

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-6xl mx-auto">
+  <div class="w-80 lg:w-full p-6">
     <h1 class="text-2xl font-semibold mb-6">Hoyo #{{ holeId }}</h1>
     <div class="mb-8">
       <h2 class="text-xl font-medium mb-2">Punteos</h2>
@@ -69,6 +69,7 @@ import Button from 'primevue/button'
 import { Divider } from 'primevue'
 import { toast } from 'vue-sonner'
 import { useQueryCache } from '@pinia/colada'
+definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const router = useRouter()
