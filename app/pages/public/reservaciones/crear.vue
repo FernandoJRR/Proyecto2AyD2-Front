@@ -1,6 +1,6 @@
 <template>
   <div class="p-8 max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold mb-6">Crear una reservación</h1>
+    <h1 class="text-4xl font-bold mb-6">Crear una reservación en linea</h1>
 
     <Stepper v-model:value="stepIndex" class="p-10" linear>
       <StepList>

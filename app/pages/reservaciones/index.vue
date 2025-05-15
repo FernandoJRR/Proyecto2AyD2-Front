@@ -74,23 +74,25 @@
           </template>
         </Column>
 
-        <Column header="" field="notShow">
+        <Column header="Estado" field="notShow">
           <template #filter>
             <Dropdown v-model="spec.notShow" :options="booleanOptions" class="w-full" placeholder="Filtrar cancelación"
               optionLabel="label" optionValue="value" @change="refetch()" />
           </template>
           <template #body="{ data }">
-            <Tag :severity="data.notShow ? 'danger' : 'info'" :value="data.notShow ? 'No se presentó' : 'Asistió'" />
+            <Tag v-if="!data.notShow && data.paid" severity="info" value="Asistió" />
+            <Tag v-else-if="!data.notShow && !data.paid" severity="warn" value="Programada" />
+            <Tag v-else-if="data.notShow" severity="danger" value="Cancelada" />
           </template>
         </Column>
 
         <Column header="Acciones">
           <template #body="{ data }">
-            <router-link :to="`/reservaciones/ver/${data.id}`">
-              <Button icon="pi pi-search" text rounded label="Ver" />
-            </router-link>
-            <Button label="Cancelar" icon="pi pi-times" severity="danger" text rounded :disabled="data.cancelled"
-              @click="cancel(data.id)" />
+              <router-link :to="`/reservaciones/ver/${data.id}`">
+                <Button icon="pi pi-search" text rounded label="Ver" />
+              </router-link>
+              <Button v-if="!data.notShow" label="Cancelar" icon="pi pi-times" severity="danger" text rounded
+                :disabled="data.cancelled" @click="cancel(data.id)" />
           </template>
         </Column>
 
