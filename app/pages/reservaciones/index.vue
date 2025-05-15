@@ -161,16 +161,6 @@ const cancel = (id: string) => {
   });
 };
 
-const pay = (id: string) => {
-  confirm.require({
-    message: "¿Deseas marcar esta reservación como pagada?",
-    header: "Confirmación",
-    icon: "pi pi-dollar",
-    accept: () => mutatePay(id),
-    reject: () => toast.warning("Operación cancelada"),
-  });
-};
-
 const { mutate: mutateCancel } = useMutation({
   mutation: cancelReservation,
   onSuccess() {
