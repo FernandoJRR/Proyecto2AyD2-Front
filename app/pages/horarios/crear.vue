@@ -6,12 +6,11 @@
       </router-link>
     </div>
 
-    <h1 class="text-4xl font-bold mb-6">Editar horario</h1>
+    <h1 class="text-4xl font-bold mb-6">Crear horario</h1>
 
     <Form
-      v-if="isScheduleReady"
       v-slot="$form"
-      :initialValues="formInitialValues"
+      :initialValues="initialValues"
       :resolver="resolver"
       @submit="onFormSubmit"
       class="space-y-8 bg-white shadow-md rounded-2xl p-6 border border-gray-200"
@@ -34,11 +33,10 @@
         <Message v-if="$form.endTime?.invalid" severity="error" size="small" variant="simple">
           {{ $form.endTime.error?.message }}
         </Message>
-
       </div>
 
       <div class="pt-4">
-        <Button type="submit" label="Guardar cambios" icon="pi pi-save" severity="secondary" />
+        <Button type="submit" label="Crear" icon="pi pi-save" severity="secondary" />
       </div>
     </Form>
   </div>
@@ -47,46 +45,15 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
-import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
-import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import { FloatLabel } from 'primevue'
-import {
-  getScheduleById,
-  updateSchedule,
-  type Schedule,
-  type UpdateSchedule
-} from '~/lib/api/schedules/schedule'
+import { createSchedule, type CreateSchedule } from '~/lib/api/schedules/schedule'
 
-const route = useRoute()
-const scheduleId = route.params.id as string
-const isScheduleReady = ref(false)
-
-
-const formInitialValues = ref<UpdateSchedule>({
+const initialValues: CreateSchedule = {
   startTime: '',
   endTime: ''
-})
-
-const { data: foundedSchedule } = useCustomQuery<Schedule>({
-  key: ['getScheduleById', scheduleId],
-  query: () => getScheduleById(scheduleId)
-})
-
-watch(
-  () => foundedSchedule.value,
-  (data) => {
-    if (data) {
-      formInitialValues.value = {
-        startTime: data.startTime,
-        endTime: data.endTime
-      }
-      isScheduleReady.value = true
-    }
-  },
-  { immediate: true }
-)
+}
 
 const resolver = zodResolver(
   z.object({
@@ -102,15 +69,14 @@ const onFormSubmit = (e: any) => {
 }
 
 const { mutate } = useMutation({
-  mutation: (payload: UpdateSchedule) => updateSchedule(scheduleId, payload),
+  mutation: (payload: CreateSchedule) => createSchedule(payload),
   onError(error) {
-    toast.error('Ocurrió un error al editar el horario', {
+    toast.error('Ocurrió un error al crear el horario', {
       description: error.message
     })
   },
   onSuccess() {
-    toast.success('El horario se ha editado correctamente')
-    useQueryCache().invalidateQueries({ key: ['getScheduleById'] })
+    toast.success('El horario se ha creado correctamente')
     useQueryCache().invalidateQueries({ key: ['getAllSchedules'] })
     navigateTo('/horarios/')
   }

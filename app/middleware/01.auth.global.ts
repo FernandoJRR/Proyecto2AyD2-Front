@@ -6,6 +6,8 @@ export default defineNuxtRouteMiddleware((to, _from) => {
 
   if (to.path === '/example') return
 
+  if(to.fullPath.includes('public')) return
+
   const token = useCookie('proyecto2ayd2-user-token')
 
   if (!token.value && !to?.fullPath.includes('login')) {

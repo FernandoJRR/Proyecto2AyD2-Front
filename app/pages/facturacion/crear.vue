@@ -58,6 +58,23 @@
         </Message>
 
         <h2 class="text-2xl font-semibold pt-4">Detalles</h2>
+        <Dropdown
+          v-model="selectedWarehouseId"
+          :options="state.data"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Seleccionar bodega"
+          class="w-full"
+        />
+        <Message
+          v-if="formTouched && !selectedWarehouseId"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          Debe seleccionar una bodega
+        </Message>
+
         <p class="text-sm text-gray-500 mb-2">
           Agrega los ítems (productos o paquetes) que deseas incluir en la
           factura.
@@ -164,7 +181,7 @@ import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
 import {
-  createInvoice,
+  createInvoiceByWarehouseId,
   getPaymentMethods,
   mapModelCreateInvoiceToCreateInvoice,
 } from "~/lib/api/invoices/invoice";
@@ -177,12 +194,17 @@ import type {
   CreateInvoice,
 } from "~/lib/api/invoices/invoice";
 import { InvoiceItemType } from "~/lib/api/invoices/invoice";
+import { getAllWarehouses } from "~/lib/api/warehouse/warehouse";
+import type { SpecWarehouse } from "~/lib/api/warehouse/warehouse";
 
 const paymentOptions = ref<PaymentMethod[]>([]);
 const itemMap = ref<
   Record<string, { name: string; price: number; itemType: InvoiceItemType }>
 >({});
 const groupedItemOptions = ref<any[]>([]);
+
+const selectedWarehouseId = ref<string | null>(null);
+const formTouched = ref(false);
 
 const tempDetail = reactive<CreateInvoiceDetail>({
   itemId: "",
@@ -196,6 +218,18 @@ const form = reactive<ModelCreateInvoice>({
   paymentMethod: "",
   clientDocument: "",
   details: [],
+});
+
+const specWarehouse = reactive<SpecWarehouse>({
+  id: null,
+  name: null,
+  active: true,
+  ubication: null,
+});
+
+const { state, asyncStatus, refetch } = useCustomQuery({
+  key: ["getAllWarehouses", specWarehouse],
+  query: () => getAllWarehouses(specWarehouse),
 });
 
 const initialValues = form;
@@ -274,16 +308,28 @@ const addDetail = () => {
   tempDetail.unitPrice = 0;
 };
 
+interface SendInvoice {
+  payload: CreateInvoice;
+  warehouseId: string;
+}
+
 const onFormSubmit = (e: any) => {
-  if (e.valid && form.details.length > 0) {
+  formTouched.value = true;
+
+  if (e.valid && form.details.length > 0 && selectedWarehouseId.value) {
     const modelPayload = {
       ...e.values,
       details: [...form.details],
     };
     const payload: CreateInvoice =
       mapModelCreateInvoiceToCreateInvoice(modelPayload);
-    console.log("Payload creacion: ", payload);
-    mutate(payload);
+    const sendPayload: SendInvoice = {
+      payload,
+      warehouseId: selectedWarehouseId.value,
+    };
+    mutate(sendPayload);
+  } else if (!selectedWarehouseId.value) {
+    toast.error("Debe seleccionar una bodega");
   } else {
     toast.error(
       "Debe completar todos los campos y agregar al menos un detalle"
@@ -292,7 +338,8 @@ const onFormSubmit = (e: any) => {
 };
 
 const { mutate } = useMutation({
-  mutation: (payload: CreateInvoice) => createInvoice(payload),
+  mutation: (sendPayload: SendInvoice) =>
+    createInvoiceByWarehouseId(sendPayload.payload, sendPayload.warehouseId),
   onError(error) {
     toast.error("Error al crear la factura", { description: error.message });
   },

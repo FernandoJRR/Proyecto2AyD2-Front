@@ -1,12 +1,8 @@
 <template>
   <div class="p-8 max-w-4xl mx-auto">
-    <router-link to="/reservaciones/" class="mb-6 block">
-      <Button label="Ver Todas" icon="pi pi-arrow-left" text />
-    </router-link>
+    <h1 class="text-4xl font-bold mb-6">Crear una reservación en linea</h1>
 
-    <h1 class="text-4xl font-bold mb-6">Crear una reservación</h1>
-
-    <Stepper v-model:value="stepIndex" class="p-10" linear>
+    <Stepper v-model:value="stepIndex" class="" linear>
       <StepList>
         <Step :value="1">Datos</Step>
         <Step :value="2">Paquete</Step>
@@ -14,7 +10,7 @@
         <Step :value="4">Facturacion</Step>
       </StepList>
 
-      <StepPanels>
+      <StepPanels class="mt-6">
         <!-- Paso 1 -->
         <StepPanel :value="1" v-slot="{ activateCallback }">
           <div class="space-y-6">
@@ -250,12 +246,7 @@ const onFormSubmit = async () => {
     console.log("PAYLOAD")
     console.log(payload)
     console.log(extraDetails.value)
-    const response = await createReservation(payload);
-
-    const blob = new Blob([response as any], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-
+    await createReservation(payload);
     toast.success("Reservación creada correctamente");
     navigateTo("/reservaciones/");
   } catch (error: any) {
