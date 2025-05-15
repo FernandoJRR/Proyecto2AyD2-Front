@@ -9,9 +9,8 @@
     <Stepper v-model:value="stepIndex" class="p-10" linear>
       <StepList>
         <Step :value="1">Datos</Step>
-        <Step :value="2">Paquete</Step>
-        <Step :value="3">Agrega mas Productos</Step>
-        <Step :value="4">Facturacion</Step>
+        <Step :value="2">Agrega Items</Step>
+        <Step :value="3">Facturacion</Step>
       </StepList>
 
       <StepPanels>
@@ -48,11 +47,15 @@
         <!-- Paso 2 -->
         <StepPanel :value="2" v-slot="{ activateCallback }">
           <div class="space-y-6">
-            <Dropdown v-model="selectedPackage" :options="packageOptions" optionLabel="label" optionValue="value"
-              placeholder="Elegir paquete" class="w-full" />
-            <Button label="Quitar selección" icon="pi pi-times" severity="danger" outlined class="mt-2"
-              @click="selectedPackage = null" />
-
+            <h2 class="text-2xl font-semibold">Agrega Items a tu Juego</h2>
+            <div class="flex flex-row gap-x-2 items-center justify-center">
+              <div class="w-full">
+                <label class="block text-sm font-medium mb-1">Paquete</label>
+                <Dropdown v-model="selectedPackage" :options="packageOptions" optionLabel="label" optionValue="value"
+                  placeholder="Elegir paquete" class="w-full" />
+              </div>
+              <Button class="mt-6 w-full" label="Agregar" icon="pi pi-plus" outlined @click="addDetailPackage" />
+            </div>
 
             <div v-if="selectedPackage?.packageDetail?.length">
               <h3 class="text-xl font-semibold mb-2">Precio: Q{{ selectedPackage.price }} - Productos incluidos:</h3>
@@ -62,22 +65,8 @@
                 </li>
               </ul>
             </div>
-
-            <div class="pt-4 flex justify-between">
-              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
-              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(3)" />
-            </div>
-          </div>
-        </StepPanel>
-
-        <!-- Paso 3 -->
-
-        <StepPanel :value="3" v-slot="{ activateCallback }">
-          <div class="space-y-6">
-            <h2 class="text-2xl font-semibold">Agregar Productos Adicionales</h2>
-
-            <div class="grid md:grid-cols-2 gap-4 items-end">
-              <div>
+            <div class="flex flex-row gap-x-2 items-center justify-center">
+              <div class="w-full">
                 <label class="block text-sm font-medium mb-1">Producto</label>
                 <Dropdown v-model="tempDetail.itemId" :options="itemOptions" optionLabel="name" optionValue="id"
                   placeholder="Seleccionar producto" class="w-full" @change="updatePrice" />
@@ -86,15 +75,13 @@
                 <label class="block text-sm font-medium mb-1">Cantidad</label>
                 <InputNumber v-model="tempDetail.quantity" :min="1" class="w-full" />
               </div>
-              <div class="md:col-span-2 text-right">
-                <Button label="Agregar" icon="pi pi-plus" outlined @click="addDetail" />
-              </div>
+              <Button class="mt-6 w-full" label="Agregar" icon="pi pi-plus" outlined @click="addDetail" />
             </div>
             <div class="max-h-40 overflow-y-auto">
               <DataTable :value="extraDetails" class="">
                 <Column header="Producto">
                   <template #body="{ data }">
-                    {{ itemMap[data.itemId]?.name ?? '—' }}
+                    {{ data.itemName }}
                   </template>
                 </Column>
                 <Column header="Cantidad" field="quantity" />
@@ -117,8 +104,8 @@
             </div>
 
             <div class="pt-4 flex justify-between">
-              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(2)" severity="secondary" />
-              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(4)" />
+              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(1)" severity="secondary" />
+              <Button label="Siguiente" icon="pi pi-arrow-right" @click="activateCallback(3)" />
             </div>
           </div>
         </StepPanel>
@@ -126,7 +113,7 @@
 
 
         <!-- Paso 4 -->
-        <StepPanel :value="4" v-slot="{ activateCallback }">
+        <StepPanel :value="3" v-slot="{ activateCallback }">
           <div class="space-y-6">
             <h2 class="text-2xl font-semibold">Resumen y Facturación</h2>
 
@@ -161,7 +148,7 @@
 
             <!-- Acciones -->
             <div class="pt-4 flex justify-between">
-              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(3)" severity="secondary" />
+              <Button label="Atrás" icon="pi pi-arrow-left" @click="activateCallback(2)" severity="secondary" />
               <Button label="Crear Reservación" icon="pi pi-save" @click="onFormSubmit" />
             </div>
           </div>
@@ -234,15 +221,7 @@ const onFormSubmit = async () => {
       paymentMethod: selectedPaymentMethod.value,
       clientDocument: form.customerNIT,
       //Primero viene el paquete en el detalle
-      details: [
-        {
-          itemId: selectedPackage.value?.id!,
-          itemName: selectedPackage.value?.name!,
-          itemType: "SERVICE",
-          quantity: 1,
-          unitPrice: selectedPackage.value?.price!
-        }
-      ]
+      details: extraDetails.value
     }
   };
 
@@ -298,11 +277,12 @@ const itemMap = ref<Record<string, { name: string; price: number }>>({})
 
 const tempDetail = reactive({
   itemId: '',
+  itemName: '',
   quantity: 1,
   unitPrice: 0
 })
 
-const extraDetails = ref<{ itemId: string; quantity: number; unitPrice: number }[]>([])
+const extraDetails = ref<{ itemId: string; itemName: string; itemType: string; quantity: number; unitPrice: number }[]>([])
 
 const addDetail = () => {
   const item = itemMap.value[tempDetail.itemId]
@@ -314,6 +294,8 @@ const addDetail = () => {
   //agregamos la seleccion al array
   extraDetails.value.push({
     itemId: tempDetail.itemId,
+    itemName: itemMap.value[tempDetail.itemId]?.name ?? '—',
+    itemType: "GOOD",
     quantity: tempDetail.quantity,
     unitPrice: item.price
   })
@@ -322,6 +304,25 @@ const addDetail = () => {
   tempDetail.itemId = ''
   tempDetail.quantity = 1
   tempDetail.unitPrice = 0
+}
+
+const addDetailPackage = () => {
+  if (!selectedPackage) {
+    toast.warning('Seleccione un paquete')
+    return
+  }
+
+  //agregamos la seleccion al array
+  extraDetails.value.push({
+    itemId: selectedPackage.value!.id,
+    itemName: selectedPackage.value!.name,
+    itemType: "SERVICE",
+    quantity: 1,
+    unitPrice: selectedPackage.value!.price
+  })
+
+  //reiniciamos valores
+  selectedPackage.value = null
 }
 
 const updatePrice = () => {
