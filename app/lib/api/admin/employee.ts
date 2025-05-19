@@ -2,6 +2,7 @@ import type { Entity } from "../utils/entity";
 import type { EmployeeType } from "./employee-type";
 
 const CURRENT_EMPLOYEE_URI = "/v1/employees";
+const CURRENT_EXTRA_PAYMENT_URI = "/v1/extra-payments";
 
 export interface HistoryType {
   type: string;
@@ -83,6 +84,27 @@ export interface EmployeeReactivationPayload {
   reactivationDate: Date;
 }
 
+export interface PaymentType {
+  id: string,
+  type: string
+}
+
+export interface ExtraPaymentPayload {
+  paymentTypeId: string,
+  reason: string,
+  amount: number,
+  description: string,
+  employeesIds: string[]
+}
+
+export interface ExtraPayment {
+  type: PaymentType,
+  amount: number,
+  description: string,
+  reason: string,
+  employees: Employee[]
+}
+
 export async function getAllEmployees(params?: {}) {
   return await $api<Employee[]>(`${CURRENT_EMPLOYEE_URI}/`, {
     params,
@@ -157,20 +179,18 @@ export const reactivateEmployee = async (
   return response;
 };
 
-export const getDoctors = async (search: string | null) => {
-  const response = await $api<Employee[]>(`${CURRENT_EMPLOYEE_URI}/doctors`, {
-    params: { search },
+export const createExtraPayment = async (data: ExtraPaymentPayload) => {
+  const response = await $api<ExtraPayment>(`${CURRENT_EXTRA_PAYMENT_URI}`, {
+    method: "POST",
+    body: data,
   });
   return response;
 };
 
-export const getEnfermeros = async (search: string | null) => {
-  const response = await $api<Employee[]>(`${CURRENT_EMPLOYEE_URI}/nurses`, {
-    params: { search },
-  });
-  return response;
+export async function getAllExtraPayments() {
+  return await $api<ExtraPayment[]>(`${CURRENT_EXTRA_PAYMENT_URI}`);
 }
 
-export async function getEmployeeInvoiceForPeriod(period: number) {
-  return await $api<Employee[]>(`${CURRENT_EMPLOYEE_URI}/${period}/vacationsInvoice`);
+export async function getExtraPaymentById(paymentId: string) {
+  return await $api<ExtraPayment>(`${CURRENT_EXTRA_PAYMENT_URI}/${paymentId}`);
 }

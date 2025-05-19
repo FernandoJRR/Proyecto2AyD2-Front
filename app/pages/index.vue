@@ -50,16 +50,6 @@ const menus = [
     route: "/stocks",
   },
   {
-    title: "Entradas",
-    description: "Administracion de Entradas",
-    route: "/entradas",
-  },
-  {
-    title: "Salidas",
-    description: "Administracion de Salidas",
-    route: "/salidas",
-  },
-  {
     title: "Entradas Productos",
     description: "Administracion de Entradas de Productos",
     route: "/entradas_productos",
