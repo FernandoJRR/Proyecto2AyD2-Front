@@ -15,6 +15,11 @@ const menus = [
     route: '/admin/personal',
   },
   {
+    title: 'Pagos Extra',
+    description: 'Administracion de Pagos Extra',
+    route: '/admin/pagos-extra',
+  },
+  {
     title: 'Configuracion',
     description: 'Configuraciones del Sistema',
     route: '/admin/configuracion',
