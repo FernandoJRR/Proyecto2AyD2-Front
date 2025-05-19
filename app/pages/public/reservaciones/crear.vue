@@ -151,6 +151,7 @@ const onFormSubmit = async () => {
     window.open(url, "_blank");
 
     toast.success("Reservación creada correctamente");
+    navigateTo("/public/reservaciones/crear");
   } catch (error: any) {
     toast.error("Error al crear la reservación", {
       description: error.message,
