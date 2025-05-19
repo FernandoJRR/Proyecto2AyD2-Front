@@ -67,7 +67,7 @@
 
       <Column header="Acciones">
         <template #body="{ data }">
-          <RouterLink :to="`/facturas/${data.id}`">
+          <RouterLink :to="`/facturacion/${data.id}`">
             <Button label="Ver" icon="pi pi-eye" severity="info" text />
           </RouterLink>
         </template>
